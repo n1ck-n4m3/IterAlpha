@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.env*
+.DS_Store
+.sites-runtime/
+*.tar.gz
+
+.wrangler/
+.vinext/
+.next/
+.dev.vars*
+*.tsbuildinfo
+!.env.example
+
+# Owner reference material is not website source.
+/The-Mom-Test-en.pdf

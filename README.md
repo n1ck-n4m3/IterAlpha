@@ -1,0 +1,52 @@
+# IterAlpha
+
+IterAlpha is an open-source, browser-based trading judgment trainer. It helps people learn, make a decision before the future is visible, review their reasoning, and practise again. The current MVP starts with crypto spot simulation. It does not place real trades or promise investment performance.
+
+The homepage at `/` introduces two paths and includes an interactive decision preview and an opt-in early-access form. The training room at `/app` contains fresh generated BTC/ETH scenarios, a market watch, a decision journal, and progress history. The Foundations path adds explanations; Advanced Practice shows facts and uncertainty first and requires a reason and thesis before each price reveal.
+
+## What works today
+
+- A fresh synthetic scenario for each round, with three hidden-future decision checkpoints and a user-selected virtual starting balance (default $10,000).
+- Spot buy, wait, hold, and sell decisions. The order preview shows USD spend, quantity, remaining cash, and estimated loss at a protective stop. Fees, slippage, fills, stops, and outcomes are calculated by the simulation engine.
+- A decision-by-decision review and saved thesis, rule-based process feedback, a journal, and JSON export. AI coaching is optional and not enabled without server credentials.
+- Live reference quotes and charts for BTC, ETH, SOL, and XRP from Coinbase Exchange. These quotes are separate from simulated trade execution.
+- An opt-in email form stored in D1. No automated email campaign is connected.
+
+Synthetic practice paths are **not historical replays**. The homepage preview is illustrative and does not save a trade. The project includes a historical snapshot adapter, but using real historical data requires a suitable license and reviewed snapshots. No brokerage account is connected.
+
+## Run locally
+
+Use Node.js 22.13 or newer. This project uses a Cloudflare Worker with a local D1 database for preview.
+
+```sh
+npm ci
+npm run check
+npm test
+npm run build
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_long_multiple_man.sql
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_bizarre_joystick.sql
+npm run start
+```
+
+Open the local URL printed by Wrangler, usually `http://127.0.0.1:8787/`. Apply each migration only once to a given local database. Local data is separate from any deployed site's D1 database.
+
+No AI key is required for the demo. To enable the optional coach, set `OPENAI_API_KEY` and `OPENAI_MODEL` as server-side secrets in your own runtime. See [.env.example](.env.example) and [the integration guide](docs/INTEGRATION-GUIDE.md). Never expose a key in the browser or commit it to Git.
+
+## Project layout
+
+| Path | Purpose |
+| --- | --- |
+| `app/`, `components/` | Landing page, training room, market watch, and charts |
+| `lib/training/` | Simulation rules, order estimates, and review calculations |
+| `lib/server/` | API, generated scenes, data adapters, storage, and optional coach |
+| `db/`, `drizzle/` | D1 schema and migrations |
+| `tests/` | API and engine tests |
+| `docs/` | Owner-facing product and integration guidance |
+
+The runtime needs a D1 binding named `DB`. If you deploy to a new host, create your own database and configure that binding; this repository does not include a production database, visitor records, email addresses, or deployment credentials. The checked-in `.openai/hosting.json` is a local build placeholder with an empty project ID. Set it to your own returned Sites project ID if you use Sites hosting. The original demonstration site uses OpenAI Sites hosting, which is separate from a self-managed Cloudflare account.
+
+## Scope and license
+
+IterAlpha is a training environment for improving human judgment, not an AI trading bot. The existing feedback is rules-based until an AI service is configured. The live market watch is informational and never settles practice orders. Results from a few simulated rounds cannot establish trading skill or real-world profitability.
+
+Source code is available under the [MIT License](LICENSE). Product name and visual identity are part of IterAlpha's brand; MIT covers the repository's software and included assets subject to their own notices where indicated.
