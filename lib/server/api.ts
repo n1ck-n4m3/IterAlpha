@@ -7,8 +7,8 @@ import { coachFeedback, ruleFeedback } from './coach.ts';
 import { marketAssets, marketSnapshot } from './live-market.ts';
 
 interface ApiEnvironment { DB?: D1Database; OPENAI_API_KEY?: string; OPENAI_MODEL?: string }
-const decisionSchema = z.object({action:z.enum(['buy','wait','hold','halve','sell']),riskPercent:z.number().finite().optional(),amountUsd:z.number().finite().optional(),stopPrice:z.number().finite().optional(),reason:z.enum(['Price structure','Defined risk','Need confirmation','Event uncertainty']).optional(),thesis:z.string().trim().max(300).optional(),version:z.number().int().min(0).max(3),requestId:z.string().uuid()}).strict();
-const startSchema = z.object({sceneId:z.string().max(80).optional(),asset:z.enum(['BTC','ETH','random']).optional(),paceHours:z.union([z.literal(1),z.literal(4)]).optional(),initialCash:z.number().int().min(100).max(1_000_000).optional(),track:z.enum(['foundations','advanced']).optional(),requestId:z.string().uuid()}).strict();
+const decisionSchema = z.object({action:z.enum(['buy','wait','hold','halve','sell']),riskPercent:z.number().finite().optional(),amountUsd:z.number().finite().optional(),stopPrice:z.number().finite().optional(),reason:z.enum(['Price structure','Defined risk','Need confirmation','Event uncertainty']).optional(),thesis:z.string().trim().max(300).optional(),version:z.number().int().min(0).max(8),requestId:z.string().uuid()}).strict();
+const startSchema = z.object({sceneId:z.string().max(80).optional(),asset:z.enum(['BTC','ETH','random']).optional(),paceHours:z.union([z.literal(0.25),z.literal(1),z.literal(4)]).optional(),initialCash:z.number().int().min(100).max(1_000_000).optional(),track:z.enum(['foundations','advanced']).optional(),requestId:z.string().uuid()}).strict();
 const coachSchema = z.object({requestId:z.string().uuid(),question:z.string().trim().max(300).default('')}).strict();
 const signupSchema = z.object({email:z.string().trim().email().max(254),track:z.enum(['foundations','advanced','undecided']),source:z.enum(['home','foundations','advanced']),consent:z.literal(true),website:z.string().max(100).optional()}).strict();
 function identity(request: Request) {
@@ -57,7 +57,7 @@ export async function handleApi(request: Request, env: ApiEnvironment): Promise<
       return json({scenes:summaries(),active:active?view(active):null,history:history(sessions),progress:progress(sessions),rules:RULES,aiConfigured:!!env.OPENAI_API_KEY&&!!env.OPENAI_MODEL,identity:user.owner.startsWith('chatgpt:')?'signed-in':'guest'});
     }
     if(path==='/api/sessions'&&request.method==='POST'){
-      const input=startSchema.parse(await readBody(request));const sceneId=input.sceneId??generatedSceneId(input.requestId,input.asset,input.paceHours);const scene=getScene(sceneId);if(!scene)throw new TrainingError('Scene not found.',404);
+      const input=startSchema.parse(await readBody(request));const sceneId=input.sceneId??generatedSceneId(input.requestId,input.asset,input.paceHours,input.track);const scene=getScene(sceneId);if(!scene)throw new TrainingError('Scene not found.',404);
       const existing=await repo.find(user.owner,input.requestId);if(existing&&existing.sceneId!==scene.id)throw new TrainingError('This request ID belongs to another scene.',409);
       if(existing&&input.initialCash!==undefined&&(existing.initialCash??RULES.initialCash)!==input.initialCash)throw new TrainingError('This request ID belongs to another starting balance.',409);
       if(existing&&input.track!==undefined&&(existing.track??'foundations')!==input.track)throw new TrainingError('This request ID belongs to another training track.',409);

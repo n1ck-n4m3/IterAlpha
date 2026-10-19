@@ -6,13 +6,13 @@ The homepage at `/` introduces two paths and includes an interactive decision pr
 
 ## What works today
 
-- A fresh synthetic scenario for each round, with three hidden-future decision checkpoints and a user-selected virtual starting balance (default $10,000).
+- A fresh synthetic scenario for each round, with six guided or eight advanced hidden-future decision checkpoints. Reveal intervals are 15 minutes, 1 hour, or 4 hours; users may wait at any checkpoint. The virtual starting balance defaults to $10,000.
 - Spot buy, wait, hold, and sell decisions. The order preview shows USD spend, quantity, remaining cash, and estimated loss at a protective stop. Fees, slippage, fills, stops, and outcomes are calculated by the simulation engine.
 - A decision-by-decision review and saved thesis, rule-based process feedback, a journal, and JSON export. AI coaching is optional and not enabled without server credentials.
 - Live reference quotes and charts for BTC, ETH, SOL, and XRP from Coinbase Exchange. These quotes are separate from simulated trade execution.
 - An opt-in email form stored in D1. No automated email campaign is connected.
 
-Synthetic practice paths are **not historical replays**. The homepage preview is illustrative and does not save a trade. The project includes a historical snapshot adapter, but using real historical data requires a suitable license and reviewed snapshots. No brokerage account is connected.
+Synthetic practice paths are **not historical replays**. Each checkpoint separates visible price, range, and volume calculations from teaching interpretations and unknowns. The homepage preview is illustrative and does not save a trade. The project includes a historical snapshot adapter with timestamped source evidence, but using real historical data requires suitable storage and display rights plus reviewed snapshots. No brokerage account is connected.
 
 ## Run locally
 
@@ -43,7 +43,7 @@ No AI key is required for the demo. To enable the optional coach, set `OPENAI_AP
 | `tests/` | API and engine tests |
 | `docs/` | Owner-facing product and integration guidance |
 
-The runtime needs a D1 binding named `DB`. If you deploy to a new host, create your own database and configure that binding; this repository does not include a production database, visitor records, email addresses, or deployment credentials. The checked-in `.openai/hosting.json` is a local build placeholder with an empty project ID. Set it to your own returned Sites project ID if you use Sites hosting. The original demonstration site uses OpenAI Sites hosting, which is separate from a self-managed Cloudflare account.
+The runtime needs a D1 binding named `DB`. If you deploy to a new host, create your own database and configure that binding; this repository does not include a production database, visitor records, email addresses, or deployment credentials. The original demonstration site uses OpenAI Sites hosting, which is separate from a self-managed Cloudflare account.
 
 ## Scope and license
 

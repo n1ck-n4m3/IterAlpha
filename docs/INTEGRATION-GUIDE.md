@@ -2,7 +2,7 @@
 
 当前线上运行规则教练和每次 Play 新生成的模拟价格场景；早期六个固定场景只作为旧训练记录兼容。此文档说明把训练回放接成真实历史数据、把规则教练接成真实 AI 所需的条件；这些条件当前**尚未满足**。
 
-Market 页现通过公开 Coinbase Exchange 报价和图表接口展示 BTC/ETH/SOL/XRP，并可连接公开报价流；站内所有 Buy / Sell 仍发生在独立的合成行情回放中。把实时观察升级为实时模拟交易时，须确认相应产品的数据使用条款允许面向用户展示和计算虚拟成交，并实现报价时间戳、过期报价拒单、账户账本、成本规则和断线恢复。不能直接把 Market 卡片上的最新成交价当作可执行买卖价。
+Market 页现通过公开 Coinbase Exchange 报价和图表接口展示 BTC/ETH/SOL/XRP，并可连接公开报价流；站内所有 Buy / Sell 仍发生在独立的合成行情回放中。Coinbase 的[市场数据条款](https://www.coinbase.com/legal/market_data)明确限制未经书面同意对第三方展示或分发市场数据；公开 API 可调用不代表取得公开产品授权。因此当前私有演示可用于验证交互，公开发布前必须取得合适授权或替换/移除该数据展示。把实时观察升级为实时模拟交易时，还须实现报价时间戳、过期报价拒单、账户账本、成本规则和断线恢复。不能直接把 Market 卡片上的最新成交价当作可执行买卖价。
 
 ## 启用真实 AI
 
@@ -14,11 +14,25 @@ Market 页现通过公开 Coinbase Exchange 报价和图表接口展示 BTC/ETH/
 
 先确定数据提供方允许此产品的**存储、对外展示、历史回放及当前 AI 用途**，并明确交易场所、币对、时区、粒度、缓存及署名条件。公开 API 或免费可下载不自动授予网站分发权；无许可不要将其数据部署给外部测试者。当前仓库没有真实行情订阅，也没有声称现有模拟图就是历史行情。
 
-服务端历史快照适配器位于 `lib/server/market-data.ts`，当前注册表 `data/historical-snapshots.json` 为空。每份经人工核对的 JSON 包含 `sceneId`、`editorReviewed: true`、`displayRightsConfirmed: true`、`source` 和恰好 88 根连续 UTC 15 分钟 K 线；字段为 `time`（Unix 秒）、`open/high/low/close` 与可选真实 `volume`。来源必须记录 provider、venue、symbol、retrievedAt、version、license、sourceUrl；导入脚本会基于蜡烛图正文生成 hash。人工确认标志是责任记录，脚本无法判断合同授权是否真实存在。
+服务端历史快照适配器位于 `lib/server/market-data.ts`，当前注册表 `data/historical-snapshots.json` 为空。每份经人工核对的 JSON 包含 `sceneId`、`editorReviewed: true`、`displayRightsConfirmed: true`、`source` 和恰好 88 根连续 UTC 15 分钟 K 线；字段为 `time`（Unix 秒）、`open/high/low/close` 与可选真实 `volume`。来源必须记录 provider、venue、symbol、retrievedAt、version、license、sourceUrl；导入脚本会基于蜡烛图正文生成 hash。可选 `evidence` 数组记录当时消息的原文链接、发布时间、实际可得时间和溯源说明；服务端只在 `availableAt` 到达当前决策点后展示。人工确认标志是责任记录，脚本无法判断合同授权是否真实存在。
 
 调用 `node --experimental-strip-types scripts/import-snapshot.mjs /absolute/path/reviewed-snapshot.json`，然后重新运行测试、构建和部署。每个场景只保留一份当前快照，并使用新的不可变版本号。导入器检查币对、长度、时间间隔、排序和 OHLC 几何。启动后新训练可使用快照；使用旧数据的进行中训练会要求新开一轮，以防两套行情混算。事件事实只在其时间早于首个决策点时出现。
 
 真实行情启用前还应人工核对六段简报是否与相应历史日期吻合，补充数据供应商实际授权记录和两个事件事实的当时版本。不要把模拟环境生成的场景描述自动视作真实历史分析。若数据仅有更粗粒度，应重新设计节点和画面标注，不把粗周期伪称 15 分钟。
+
+## 可取得哪些历史数据
+
+- [Binance Public Data](https://github.com/binance/binance-public-data) 提供按日/月下载的现货与合约 K 线和成交记录，适合离线研究、批量生成候选窗口；官方说明覆盖其交易对和上市后的时间，不是“所有加密市场从诞生到现在”。2025 年起部分现货时间戳使用微秒，导入时必须处理单位。该仓库的代码许可不应直接解释为网站对行情数据的再分发许可，公开产品仍要核对条款。
+- [Coinbase Exchange 蜡烛图 API](https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles) 可按时间窗读取其交易所的历史行情，适合开发时抽样核验；不适合未经授权直接复制成公开训练库。当前 Market 页已经依赖该服务，其公开展示权是发布前的阻断项。
+- [GDELT 数据下载](https://gdeltproject.org/data.html) 可以检索新闻事件及文章元数据，用于找候选消息；但文章被采集时间可能晚于发布时间，不能把事后找到的标题提前给历史场景中的玩家。[GDELT 对时间戳延迟的说明](https://blog.gdeltproject.org/new-gkg-2-0-article-metadata-fields/)也指出报道的发现时间可能滞后。优先使用联储、SEC、交易所等原始公告，并保留原文链接与当时版本。文章正文版权需单独处理。
+
+本地研究时可运行 `node scripts/prepare-coinbase-snapshot.mjs btc-pullback 2024-04-08T00:00:00Z /private/tmp/btc-pullback-research.json` 下载一个 88 根 K 线窗口。脚本会检查连续性，并强制把草稿保存在仓库外；输出中的人工审核和展示授权均为 `false`，因此不能直接导入或发布。此脚本只处理抽样窗口，不会自动下载“所有历史”。
+
+第一批真实内容建议只选 BTC-USD 与 ETH-USD 各几个已核验窗口，保存“交易所 + 币对 + UTC 开始时间 + 每条消息可得时间 + 许可记录 + hash”。对历史回放做隐藏未来的逐步验收，再扩展到数十个窗口。现有快照适配器只覆盖 88 根 K 线的旧场景；任意日期和连续历史库仍需新建存储与索引，不应声称当前已经实现。
+
+## 关于训练一个生成市场的模型
+
+历史 K 线并不包含“为什么涨跌”的标签，也不能训练出可靠的未来新闻。用生成模型创造曲线与消息可以做明确标为**合成压力测试**的练习，但不能写成真实历史、真实新闻或具有预测能力。MVP 更有价值的顺序是：真实历史切片与可得信息重放 → 规则化复盘与个性化错误类型 → 有许可的数据集和统一评估 → 必要时再训练条件场景生成器。即使后续训练生成器，也要以未参与训练的时期检验统计特征、极端行情、行为多样性与是否泄漏未来数据。
 
 ## 演示版与真实版的边界
 

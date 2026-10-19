@@ -51,19 +51,31 @@ test('Play generates a fresh reconstructable scene with chosen capital and check
   assert.equal((await visit('/api/sessions',{requestId:firstId,asset:'BTC',paceHours:4,initialCash:25_000})).status,200);
   assert.equal((await visit('/api/sessions',{requestId:firstId,asset:'BTC',paceHours:4,initialCash:10_000})).status,409);
   let current=first.data;
-  for(let i=0;i<3;i++){const result=await visit(`/api/sessions/${firstId}/decisions`,{action:'wait',version:i,requestId:crypto.randomUUID()});assert.equal(result.status,200);current=result.data;}
+  assert.equal(first.data.nodeCount,6);
+  for(let i=0;i<first.data.nodeCount;i++){const result=await visit(`/api/sessions/${firstId}/decisions`,{action:'wait',version:i,requestId:crypto.randomUUID()});assert.equal(result.status,200);current=result.data;}
   assert.equal(current.status,'completed');assert.equal(current.account.cash,25_000);assert.equal(current.outcome.netPnl,0);assert.equal(current.outcome.returnPercent,0);
 });
 test('training tracks persist and advanced practice requires a recorded thesis',async()=>{
   const visit=await browser(database());const id=crypto.randomUUID();
   const start=await visit('/api/sessions',{requestId:id,track:'advanced',paceHours:4});
-  assert.equal(start.status,201);assert.equal(start.data.track,'advanced');
+  assert.equal(start.status,201);assert.equal(start.data.track,'advanced');assert.equal(start.data.nodeCount,8);
   assert.equal((await visit(`/api/sessions/${id}`)).data.track,'advanced');
   assert.equal((await visit('/api/sessions',{requestId:id,track:'foundations',paceHours:4})).status,409);
   assert.equal((await visit(`/api/sessions/${id}/decisions`,{action:'wait',version:0,requestId:crypto.randomUUID()})).status,400);
   const input={action:'wait',version:0,requestId:crypto.randomUUID(),reason:'Need confirmation',thesis:'The setup lacks confirmation at this checkpoint.'};
   const decision=await visit(`/api/sessions/${id}/decisions`,input);
   assert.equal(decision.status,200);assert.equal(decision.data.decisions[0].input.thesis,input.thesis);
+});
+test('fifteen-minute rounds reveal only one new candle at each decision',async()=>{
+  const visit=await browser(database());const id=crypto.randomUUID();
+  const start=await visit('/api/sessions',{requestId:id,paceHours:0.25});
+  assert.equal(start.status,201);assert.equal(start.data.nodeCount,6);
+  assert.equal(start.data.decisionTimes[1]-start.data.decisionTimes[0],900);
+  assert.equal(start.data.candles.length,64);
+  const next=await visit(`/api/sessions/${id}/decisions`,{action:'wait',version:0,requestId:crypto.randomUUID()});
+  assert.equal(next.status,200);assert.equal(next.data.candles.length,65);
+  assert.ok(next.data.context.some((item:{id:string})=>item.id.startsWith('range-')));
+  assert.ok(next.data.context.some((item:{id:string})=>item.id.startsWith('volume-')));
 });
 test('early access requires consent and saves a normalized email once',async()=>{
   const db=database();const visit=await browser(db);
@@ -115,4 +127,8 @@ test('historical adapter rejects missing bars, false rights claims and invented 
   assert.throws(()=>adapter.read({...snapshot,displayRightsConfirmed:false}));
   const missing=structuredClone(snapshot);missing.candles[4].time+=900;assert.throws(()=>adapter.read(missing));
   const bad=structuredClone(snapshot);bad.candles[0].high=1;assert.throws(()=>adapter.read(bad));
+  const item={id:'source-1',kind:'fact',title:'Published notice',text:'A verified notice was published.',source:'Official publisher',sourceUrl:'https://example.com/notice',publishedAt:'2024-04-08T12:00:00Z',availableAt:'2024-04-08T12:15:00Z',provenance:'Publisher timestamp checked against an archived copy.'};
+  assert.equal(adapter.read({...snapshot,evidence:[item]}).evidence?.length,1);
+  assert.throws(()=>adapter.read({...snapshot,evidence:[{...item,availableAt:'2024-04-08T11:59:00Z'}]}));
+  assert.throws(()=>adapter.read({...snapshot,evidence:[item,item]}));
 });

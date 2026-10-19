@@ -35,39 +35,58 @@ export const scenes: Scene[] = demoScenes.map(scene => {
   const snapshot = snapshotAdapter.read(candidate);
   if (snapshot.source.symbol !== `${scene.asset}-USD`) throw new Error('Snapshot symbol mismatch.');
   const cutoff = (snapshot.candles[scene.nodes[0]].time + 900) * 1000;
-  const context = scene.context && Date.parse(scene.context.availableAt) <= cutoff ? {...scene.context, text: scene.context.text.replace('This is real historical context alongside a simulated price path.', 'This release provides historical context, not proof of causation.').replace('The accompanying chart is simulated.', 'Price data are from the stated venue.')} : undefined;
-  return {...scene, mode:'historical', version:`scene-v1-${snapshot.source.version}`, source:snapshot.source, candles:snapshot.candles, context, uncertainty:scene.topic === 'event' ? 'The statement does not establish what expectations were already priced in or what caused the subsequent price path.' : scene.uncertainty};
+  const context = scene.context && Date.parse(scene.context.availableAt) >= snapshot.candles[0].time*1000 && Date.parse(scene.context.availableAt) <= cutoff ? {...scene.context, text: scene.context.text.replace('This is real historical context alongside a simulated price path.', 'This release provides historical context, not proof of causation.').replace('The accompanying chart is simulated.', 'Price data are from the stated venue.')} : undefined;
+  return {...scene, mode:'historical', version:`scene-v1-${snapshot.source.version}`, source:snapshot.source, candles:snapshot.candles, context, evidence:snapshot.evidence, uncertainty:scene.topic === 'event' ? 'The statement does not establish what expectations were already priced in or what caused the subsequent price path.' : scene.uncertainty};
 });
-export function generatedSceneId(requestId: string, asset: 'BTC' | 'ETH' | 'random' = 'random', paceHours: 1 | 4 = 1) {
+export type CheckpointHours = 0.25 | 1 | 4;
+export function generatedSceneId(requestId: string, asset: 'BTC' | 'ETH' | 'random' = 'random', paceHours: CheckpointHours = 1, track: 'foundations' | 'advanced' = 'foundations') {
   const hex = requestId.replaceAll('-', '').slice(0, 8).toLowerCase();
   const seed = Number.parseInt(hex, 16);
   const chosenAsset = asset === 'random' ? seed % 2 ? 'BTC' : 'ETH' : asset;
   const topic: Topic = (['trend', 'range', 'event'] as const)[seed % 3];
-  return `play-${chosenAsset.toLowerCase()}-${topic}-${paceHours}h-${hex}`;
+  return `play-${chosenAsset.toLowerCase()}-${topic}-${paceHours === 0.25 ? '15m' : `${paceHours}h`}-${track === 'advanced' ? 8 : 6}n-${hex}`;
 }
 function generatedScene(id: string): Scene | undefined {
-  const match = /^play-(btc|eth)-(trend|range|event)-(1|4)h-([0-9a-f]{8})$/.exec(id);
+  const match = /^play-(btc|eth)-(trend|range|event)-(15m|1h|4h)(?:-(6|8)n)?-([0-9a-f]{8})$/.exec(id);
   if (!match) return undefined;
   const asset = match[1].toUpperCase() as 'BTC' | 'ETH';
   const topic = match[2] as Topic;
-  const paceHours = Number(match[3]);
-  const seed = Number.parseInt(match[4], 16);
+  const paceHours = match[3] === '15m' ? 0.25 : Number(match[3].slice(0, -1));
+  const nodeCount = match[4] ? Number(match[4]) : 3;
+  const seed = Number.parseInt(match[5], 16);
   const step = paceHours * 4;
-  const nodes = [63, 63 + step, 63 + 2 * step];
-  const end = 63 + 3 * step;
+  const nodes = Array.from({length:nodeCount},(_,index)=>63+index*step);
+  const end = 63 + nodeCount * step;
   const base = (asset === 'BTC' ? 60_000 : 3_000) * (0.8 + (seed % 4001) / 10_000);
   const start = Date.parse('2026-01-01T00:00:00Z') / 1000 + (seed % 180) * 86_400;
   const title = topic === 'trend' ? 'Trend decision' : topic === 'range' ? 'Range decision' : 'Volatility decision';
   const inference = topic === 'trend' ? 'Recent direction is visible, but it does not establish that the next move will continue.' : topic === 'range' ? 'A visible boundary may hold or break; neither outcome is guaranteed.' : 'A wider price range makes both opportunity and execution uncertainty larger.';
-  return {id, asset, topic, title, subtitle:`Fresh ${asset} spot practice · ${paceHours}h checkpoints`, difficulty:'Adaptive practice', objective:'Choose an amount, preserve cash for later decisions, and explain the condition that would change your view.', minutes:4, mode:'synthetic', version:'generated-v1', source:{mode:'synthetic',provider:'IterAlpha authored simulation',venue:'No exchange',symbol:`${asset}-USD`,intervalSeconds:900,retrievedAt:'2026-10-11T00:00:00Z',version:`generated-v1-${seed}-${topic}-${paceHours}`,license:'Deterministic teaching data. These are not historical prices, volumes, or live quotes.'}, candles:generateCandles(seed,base,topic,start,end+1),nodes,end,inference,uncertainty:'Only the revealed synthetic candles are known. The next segment has not been shown.'};
+  const paceLabel = match[3];
+  const generationVersion = nodeCount === 3 ? 'generated-v1' : 'generated-v2';
+  const dataVersion = nodeCount === 3 ? `generated-v1-${seed}-${topic}-${paceHours}` : `${generationVersion}-${seed}-${topic}-${paceLabel}-${nodeCount}`;
+  return {id, asset, topic, title, subtitle:`Fresh ${asset} spot practice · ${paceLabel} checkpoints`, difficulty:'Adaptive practice', objective:'Choose an amount, preserve cash for later decisions, and explain the condition that would change your view.', minutes:nodeCount === 8 ? 12 : 9, mode:'synthetic', version:generationVersion, source:{mode:'synthetic',provider:'IterAlpha authored simulation',venue:'No exchange',symbol:`${asset}-USD`,intervalSeconds:900,retrievedAt:'2026-10-11T00:00:00Z',version:dataVersion,license:'Deterministic teaching data. These are not historical prices, volumes, or live quotes.'}, candles:generateCandles(seed,base,topic,start,end+1),nodes,end,inference,uncertainty:'Only the revealed synthetic candles are known. The next segment has not been shown.'};
 }
 export function getScene(id: string): Scene | undefined { return scenes.find(s => s.id === id) ?? generatedScene(id); }
 export function summaries(): SceneSummary[] { return scenes.map(({id,title,subtitle,asset,topic,difficulty,objective,minutes,mode})=>({id,title,subtitle,asset,topic,difficulty,objective,minutes,mode})); }
 export function evidenceAt(scene: Scene, cursor: number): Evidence[] {
-  const current = scene.candles[cursor]; const past = scene.candles[Math.max(0,cursor-16)];
+  const current = scene.candles[cursor]; const visible = scene.candles.slice(0,cursor+1); const recent = visible.slice(-16); const past = scene.candles[Math.max(0,cursor-16)];
   const change = (current.close / past.close - 1) * 100;
   const cutoff = new Date((current.time + scene.source.intervalSeconds)*1000).toISOString();
-  const fact: Evidence = scene.context && Date.parse(scene.context.availableAt) <= Date.parse(cutoff) ? scene.context : {id:`price-${cursor}`,kind:'fact',title:'The visible price path',text:`The last close is $${current.close.toFixed(2)}, ${change>=0?'up':'down'} ${Math.abs(change).toFixed(2)}% from 16 candles earlier. ${scene.mode === 'synthetic' ? 'These are simulated prices.' : 'Historical prices from the stated venue.'}`,source:'Visible candles · calculated',publishedAt:cutoff,availableAt:cutoff,provenance:`${scene.source.version}; close-to-close change using only visible candles.`};
-  return [fact,{id:`inference-${cursor}`,kind:'inference',title:'One interpretation',text:scene.inference,source:'IterAlpha teaching note',publishedAt:cutoff,availableAt:cutoff,provenance:'Authored interpretation, not a historical fact or a prediction.'},{id:`unknown-${cursor}`,kind:'unknown',title:'What remains uncertain',text:scene.uncertainty,source:'Scene boundary',publishedAt:cutoff,availableAt:cutoff,provenance:'Explicit limitation of the available information.'}];
+  const label = scene.mode === 'synthetic' ? 'simulated' : 'venue';
+  const low = Math.min(...recent.map(c=>c.low)); const high = Math.max(...recent.map(c=>c.high));
+  const range = (high/low-1)*100;
+  const earlier = visible.slice(-32,-16);
+  const recentVolume = recent.reduce((sum,c)=>sum+(c.volume??0),0);
+  const earlierVolume = earlier.reduce((sum,c)=>sum+(c.volume??0),0);
+  const facts: Evidence[] = [
+    {id:`price-${cursor}`,kind:'fact',title:'Visible price change',text:`The last close is $${current.close.toFixed(2)}, ${change>=0?'up':'down'} ${Math.abs(change).toFixed(2)}% over 16 candles. These are ${label} prices.`,source:'Visible candles · calculated',publishedAt:cutoff,availableAt:cutoff,provenance:`${scene.source.version}; close-to-close change using only revealed candles.`},
+    {id:`range-${cursor}`,kind:'fact',title:'Recent trading range',text:`The last 16 candles span $${low.toFixed(2)}–$${high.toFixed(2)} (${range.toFixed(2)}%). A wider range increases the distance a stop may need to cover.`,source:'Visible candles · calculated',publishedAt:cutoff,availableAt:cutoff,provenance:`${scene.source.version}; minimum low and maximum high from 16 revealed candles.`},
+  ];
+  if (recent.every(c=>c.volume!==undefined) && earlier.length===16 && earlier.every(c=>c.volume!==undefined) && earlierVolume>0) {
+    facts.push({id:`volume-${cursor}`,kind:'fact',title:'Activity compared with the prior window',text:`The last 16 candles have ${(recentVolume/earlierVolume).toFixed(2)}× the volume of the preceding 16. Volume alone does not establish direction.${scene.mode==='synthetic'?' Activity here is simulated.':''}`,source:'Visible candles · calculated',publishedAt:cutoff,availableAt:cutoff,provenance:`${scene.source.version}; sum of the two most recent non-overlapping 16-candle windows.`});
+  }
+  if (scene.context && Date.parse(scene.context.availableAt) <= Date.parse(cutoff)) facts.push(scene.context);
+  for(const item of scene.evidence??[])if(Date.parse(item.availableAt)<=Date.parse(cutoff))facts.push(item);
+  return [...facts,{id:`inference-${cursor}`,kind:'inference',title:'One interpretation',text:scene.inference,source:'IterAlpha teaching note',publishedAt:cutoff,availableAt:cutoff,provenance:'Authored interpretation, not a historical fact or a prediction.'},{id:`unknown-${cursor}`,kind:'unknown',title:'What remains uncertain',text:scene.uncertainty,source:'Scene boundary',publishedAt:cutoff,availableAt:cutoff,provenance:'Explicit limitation of the available information.'}];
 }
 export function view(session: Session) { const scene = getScene(session.sceneId); if (!scene) throw new Error('Scene not found.'); if (session.sceneVersion !== scene.version || session.dataVersion !== scene.source.version) throw new TrainingError('The scene data changed. Start a new round.', 409); return sessionView(session,scene,evidenceAt(scene,session.cursor)); }

@@ -16,7 +16,7 @@ export interface SceneSummary {
 }
 export interface Scene extends SceneSummary {
   version: string; source: MarketSource; candles: Candle[]; nodes: number[]; end: number;
-  context?: Evidence; inference: string; uncertainty: string;
+  context?: Evidence; evidence?: Evidence[]; inference: string; uncertainty: string;
 }
 export interface DecisionInput { action: Action; riskPercent?: number; amountUsd?: number; stopPrice?: number; reason?: string; thesis?: string; version: number; requestId: string }
 export interface Fill { id: string; side: 'buy' | 'sell'; reason: 'entry' | 'reduce' | 'exit' | 'stop' | 'end'; time: number; price: number; quantity: number; fee: number }

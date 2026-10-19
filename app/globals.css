@@ -70,3 +70,14 @@
 .live-symbols button{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;border:1px solid #392c4d;border-radius:7px;background:#181321;padding:15px}.live-symbols button.active{border-color:#9a6be2;background:#251a34}.live-symbols button:hover{border-color:#b894ff}.live-symbols button b{font-size:20px;font-weight:550;color:#f0e7fb;font-variant-numeric:tabular-nums}.live-symbols button small{font-size:10px;color:#a797bb}.market-direct{padding:18px 0 0}.market-direct>.section-heading{padding:0 18px}.market-direct>.section-heading>span{display:flex;align-items:center;gap:7px}.live-price-row{display:flex;align-items:center;justify-content:space-between;padding:4px 18px 20px;gap:12px}.live-price-row>div{display:flex;flex-direction:column;gap:7px}.live-price-row strong{font-size:32px;letter-spacing:-.8px;font-weight:550;font-variant-numeric:tabular-nums}.live-price-row span{font-size:10px;color:#9587a5}.live-chart-direct{min-height:390px}.live-chart-direct .market-chart{height:390px}.live-chart-empty{height:390px;display:grid;place-items:center;color:#9b90aa;font-size:13px}.market-timestamp{margin-left:auto;font-size:10px;color:#a193b0}.live-error{font-size:11px;color:#e6a9b8;padding:8px 18px 16px}.live-watch .live-notice{margin-top:18px}.live-watch .live-widget-panel{margin-bottom:0}
 @media(max-width:690px){.live-symbols button{padding:12px}.live-symbols button b{font-size:17px}.live-price-row strong{font-size:24px}.live-chart-direct,.live-chart-direct .market-chart,.live-chart-empty{min-height:300px;height:300px}.market-direct>.section-heading{padding:0 12px}.live-price-row{padding:4px 12px 15px}.market-timestamp{font-size:9px}}
 .live-chart-note{font-size:10px;color:#9f93ae;padding:9px 18px 14px;line-height:1.5}
+
+/* Longer rounds keep the complete timeline reachable on small screens. */
+.decision-timeline{display:flex;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#68497f transparent}
+.decision-timeline .timeline-step{flex:0 0 auto;min-width:112px;scroll-snap-align:start}
+.round-depth{display:flex;flex-direction:column;gap:7px;border:1px solid #503966;background:linear-gradient(110deg,#2a173b,#17101f);border-radius:6px;padding:14px 16px;margin:-8px 0 23px}
+.round-depth strong{font-size:12px;color:#e3caf8;font-weight:600}
+.round-depth span{font-size:10px;line-height:1.5;color:#aa96bf}
+.checkpoint-guide{padding:13px 14px;border:1px solid #61467a;background:linear-gradient(125deg,#302042,#21172d);border-radius:6px;margin:14px 0 16px}
+.checkpoint-guide span{font-size:8px;letter-spacing:1.2px;font-weight:700;color:#d3a5ff}
+.checkpoint-guide p{font-size:11px;line-height:1.55;color:#dacbea;margin-top:7px}
+@media(max-width:690px){.decision-timeline .timeline-step{min-width:100px}.round-depth{margin-top:0}.checkpoint-guide p{font-size:12px}}
