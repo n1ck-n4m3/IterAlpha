@@ -23,7 +23,7 @@ export default function MarketChart({candles,fills,stop,revision,style='candles'
   const current=hover===null?null:display[hover];
   const baseline=display[0].close;
   return <div className="market-chart market-chart-svg" onMouseMove={event=>{const box=event.currentTarget.getBoundingClientRect();const relative=(event.clientX-box.left)/box.width*W;const index=Math.floor((relative-L)/(W-L-R)*display.length);setHover(index>=0&&index<display.length?index:null);}} onMouseLeave={()=>setHover(null)}>
-    <svg data-revision={revision} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label={`${style} chart with ${candles.length} visible bars. Last actual close ${candles.at(-1)?.close.toFixed(2)} dollars.${training?' Future prices are hidden until a decision is saved.':''}`}>
+    <svg data-revision={revision} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label={`${style} chart with ${candles.length} visible bars. Last visible close ${candles.at(-1)?.close.toFixed(2)} dollars.${training?' Future prices are hidden until a decision is saved.':''}`}>
       <defs><linearGradient id="chartArea" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#8a9dff" stopOpacity=".42"/><stop offset="1" stopColor="#8a9dff" stopOpacity=".015"/></linearGradient><radialGradient id="chartSurface"><stop stopColor="#172e5d"/><stop offset="1" stopColor="#081329"/></radialGradient></defs>
       <rect width={W} height={H} fill="url(#chartSurface)"/>
       {Array.from({length:5},(_,i)=>{const yy=T+i*(H-T-B)/4;return <g key={i}><line x1={L} x2={W-R+9} y1={yy} y2={yy} stroke="#627ab050" strokeWidth="1" strokeDasharray="3 6"/><text x={W-R+16} y={yy+4} fill="#aab9d7" fontSize="12">{priceLabel(max-(max-min)*i/4)}</text></g>;})}

@@ -4,7 +4,7 @@ import { Repository } from './repository.ts';
 import { generatedSceneId, getScene, summaries, view } from './scenes.ts';
 import { history, progress } from './progress.ts';
 import { coachFeedback, ruleFeedback, ruleStepFeedback, stepCoachFeedback } from './coach.ts';
-import { marketAssets, marketSnapshot } from './live-market.ts';
+import { marketAssets, syntheticMarketSnapshot } from './synthetic-market.ts';
 
 interface ApiEnvironment { DB?: D1Database; OPENAI_API_KEY?: string; OPENAI_MODEL?: string }
 const decisionSchema = z.object({action:z.enum(['buy','wait','hold','halve','sell']),riskPercent:z.number().finite().optional(),amountUsd:z.number().finite().optional(),sellPercent:z.number().finite().min(1).max(100).optional(),stopPrice:z.number().finite().optional(),reason:z.enum(['Price structure','Defined risk','Need confirmation','Event uncertainty']).optional(),thesis:z.string().trim().max(300).optional(),version:z.number().int().min(0).max(8),requestId:z.string().uuid()}).strict();
@@ -44,7 +44,7 @@ export async function handleApi(request: Request, env: ApiEnvironment): Promise<
     if(path==='/api/market'&&request.method==='GET'){
       const selected=url.searchParams.get('symbol')??'BTC';
       if(!marketAssets.includes(selected as typeof marketAssets[number]))throw new TrainingError('Unsupported market symbol.',400);
-      return json(await marketSnapshot(selected as typeof marketAssets[number]));
+      return json(syntheticMarketSnapshot(selected as typeof marketAssets[number]));
     }
     if(!env.DB)throw new TrainingError('Training storage is unavailable. Please try again shortly.',503);
     const repo=new Repository(env.DB);

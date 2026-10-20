@@ -2,7 +2,7 @@
 
 当前线上运行规则教练和每次 Play 新生成的模拟价格场景；早期六个固定场景只作为旧训练记录兼容。此文档说明把训练回放接成真实历史数据、把规则教练接成真实 AI 所需的条件；这些条件当前**尚未满足**。
 
-Market 页现通过公开 Coinbase Exchange 报价和图表接口展示 BTC/ETH/SOL/XRP，并可连接公开报价流；站内所有 Buy / Sell 仍发生在独立的合成行情回放中。Coinbase 的[市场数据条款](https://www.coinbase.com/legal/market_data)明确限制未经书面同意对第三方展示或分发市场数据；公开 API 可调用不代表取得公开产品授权。因此当前私有演示可用于验证交互，公开发布前必须取得合适授权或替换/移除该数据展示。把实时观察升级为实时模拟交易时，还须实现报价时间戳、过期报价拒单、账户账本、成本规则和断线恢复。不能直接把 Market 卡片上的最新成交价当作可执行买卖价。
+公开测试版的 Market Lab 使用本地生成的合成示例行情；网站不调用 Coinbase 报价与行情流。`lib/server/live-market.ts` 仍保留为未启用的接入适配器。Coinbase 的[市场数据条款](https://www.coinbase.com/legal/market_data)限制未经书面同意对第三方展示或分发市场数据，且将应用提供给外部终端用户也受到限制；公开 API 可调用不代表取得公开产品授权。取得适当许可后，才应重新启用真实行情并标明来源、时间戳与用途。把实时观察升级为实时模拟交易时，还须实现过期报价拒单、账户账本、成本规则和断线恢复，不能把屏幕上的最新成交价当作可执行买卖价。
 
 ## 启用真实 AI
 
@@ -23,7 +23,7 @@ Market 页现通过公开 Coinbase Exchange 报价和图表接口展示 BTC/ETH/
 ## 可取得哪些历史数据
 
 - [Binance Public Data](https://github.com/binance/binance-public-data) 提供按日/月下载的现货与合约 K 线和成交记录，适合离线研究、批量生成候选窗口；官方说明覆盖其交易对和上市后的时间，不是“所有加密市场从诞生到现在”。2025 年起部分现货时间戳使用微秒，导入时必须处理单位。该仓库的代码许可不应直接解释为网站对行情数据的再分发许可，公开产品仍要核对条款。
-- [Coinbase Exchange 蜡烛图 API](https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles) 可按时间窗读取其交易所的历史行情，适合开发时抽样核验；不适合未经授权直接复制成公开训练库。当前 Market 页已经依赖该服务，其公开展示权是发布前的阻断项。
+- [Coinbase Exchange 蜡烛图 API](https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles) 可按时间窗读取其交易所的历史行情，适合开发时抽样核验；不适合未经授权直接复制成公开训练库。公开测试版不调用该服务，重新接入前仍需确认展示权。
 - [GDELT 数据下载](https://gdeltproject.org/data.html) 可以检索新闻事件及文章元数据，用于找候选消息；但文章被采集时间可能晚于发布时间，不能把事后找到的标题提前给历史场景中的玩家。[GDELT 对时间戳延迟的说明](https://blog.gdeltproject.org/new-gkg-2-0-article-metadata-fields/)也指出报道的发现时间可能滞后。优先使用联储、SEC、交易所等原始公告，并保留原文链接与当时版本。文章正文版权需单独处理。
 
 本地研究时可运行 `node scripts/prepare-coinbase-snapshot.mjs btc-pullback 2024-04-08T00:00:00Z /private/tmp/btc-pullback-research.json` 下载一个 88 根 K 线窗口。脚本会检查连续性，并强制把草稿保存在仓库外；输出中的人工审核和展示授权均为 `false`，因此不能直接导入或发布。此脚本只处理抽样窗口，不会自动下载“所有历史”。

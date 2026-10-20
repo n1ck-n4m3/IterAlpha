@@ -8,6 +8,7 @@ import {createSession,advanceSession} from '../lib/training/engine.ts';
 import {generatedSceneId,getScene,scenes} from '../lib/server/scenes.ts';
 import {HistoricalSnapshotAdapter} from '../lib/server/market-data.ts';
 import {parseCoinbaseCandles} from '../lib/server/live-market.ts';
+import {syntheticMarketSnapshot} from '../lib/server/synthetic-market.ts';
 
 function database(){
   const sql=new DatabaseSync(':memory:');
@@ -97,6 +98,21 @@ test('early access requires consent and saves a normalized email once',async()=>
 });
 test('Coinbase candle parser keeps valid chronological OHLC bars only',()=>{
   assert.deepEqual(parseCoinbaseCandles([[2000,90,110,100,105,12],[1000,80,100,90,95,8],[3000,90,80,85,88,5],['bad',1,2,1,2,1]]).map(c=>c.time),[1000,2000]);
+});
+test('public market endpoint serves only deterministic synthetic samples',async()=>{
+  const now=Date.parse('2026-10-20T19:34:00Z');
+  const first=syntheticMarketSnapshot('BTC',now);
+  assert.equal(first.mode,'synthetic');
+  assert.equal(first.chart.length,192);
+  assert.deepEqual(first,syntheticMarketSnapshot('BTC',now));
+  assert(first.chart.every(c=>c.low<=Math.min(c.open,c.close)&&c.high>=Math.max(c.open,c.close)));
+  const response=await handleApi(new Request('http://localhost/api/market?symbol=ETH'),{});
+  assert.equal(response.status,200);
+  const body=await response.json() as {mode:string;source:string;selected:string;chart:unknown[]};
+  assert.equal(body.mode,'synthetic');
+  assert.equal(body.selected,'ETH');
+  assert.equal(body.chart.length,192);
+  assert.match(body.source,/Synthetic/);
 });
 test('simultaneous submissions commit exactly one version',async()=>{
   const db=database();const visit=await browser(db);const id=crypto.randomUUID();await visit('/api/sessions',{sceneId:'eth-boundary',requestId:id});

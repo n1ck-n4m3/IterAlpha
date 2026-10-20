@@ -2,17 +2,17 @@
 
 IterAlpha is an open-source, browser-based trading judgment trainer. It helps people learn, make a decision before the future is visible, review their reasoning, and practise again. The current MVP starts with crypto spot simulation. It does not place real trades or promise investment performance.
 
-The homepage at `/` introduces two paths and includes an interactive decision preview and an opt-in early-access form. The training room at `/app` contains fresh generated BTC/ETH scenarios, a market watch, a decision journal, and progress history. The Foundations path adds explanations; Advanced Practice shows facts and uncertainty first and requires a reason and thesis before each price reveal.
+The homepage at `/` introduces two paths and includes an interactive decision preview and an opt-in early-access form. The training room at `/app` contains fresh generated BTC/ETH scenarios, a synthetic market lab, a decision journal, and progress history. The Foundations path adds explanations; Advanced Practice shows facts and uncertainty first. Reasons are optional taps, not writing assignments.
 
 ## What works today
 
 - A fresh synthetic scenario for each round, with six guided or eight advanced hidden-future decision checkpoints. Reveal intervals are 15 minutes, 1 hour, or 4 hours; users may wait at any checkpoint. The virtual starting balance defaults to $10,000.
 - Spot buy, wait, hold, and sell decisions. The order preview shows USD spend, quantity, remaining cash, and estimated loss at a protective stop. Fees, slippage, fills, stops, and outcomes are calculated by the simulation engine.
-- A decision-by-decision review and saved thesis, rule-based process feedback, a journal, and JSON export. AI coaching is optional and not enabled without server credentials.
-- Live reference quotes and charts for BTC, ETH, SOL, and XRP from Coinbase Exchange. These quotes are separate from simulated trade execution.
+- A decision-by-decision review, rule-based process feedback, a journal, and JSON export. AI coaching is optional and not enabled without server credentials.
+- A synthetic market lab with charts for BTC, ETH, SOL, and XRP. Its sample values are not live or historical quotes and are separate from simulated trade execution.
 - An opt-in email form stored in D1. No automated email campaign is connected.
 
-Synthetic practice paths are **not historical replays**. Each checkpoint separates visible price, range, and volume calculations from teaching interpretations and unknowns. The homepage preview is illustrative and does not save a trade. The project includes a historical snapshot adapter with timestamped source evidence, but using real historical data requires suitable storage and display rights plus reviewed snapshots. No brokerage account is connected.
+Synthetic practice paths are **not historical replays**. Each checkpoint separates visible price, range, and volume calculations from teaching interpretations and unknowns. The homepage preview is illustrative and does not save a trade. The project includes a historical snapshot adapter and a dormant Coinbase integration adapter; neither supplies prices to the public test. Using real data requires suitable storage and display rights plus reviewed snapshots. No brokerage account is connected.
 
 ## Run locally
 
@@ -47,6 +47,6 @@ The runtime needs a D1 binding named `DB`. If you deploy to a new host, create y
 
 ## Scope and license
 
-IterAlpha is a training environment for improving human judgment, not an AI trading bot. The existing feedback is rules-based until an AI service is configured. The live market watch is informational and never settles practice orders. Results from a few simulated rounds cannot establish trading skill or real-world profitability.
+IterAlpha is a training environment for improving human judgment, not an AI trading bot. The existing feedback is rules-based until an AI service is configured. Market Lab is an explicitly synthetic visualization and never settles practice orders. Results from a few simulated rounds cannot establish trading skill or real-world profitability.
 
 Source code is available under the [MIT License](LICENSE). Product name and visual identity are part of IterAlpha's brand; MIT covers the repository's software and included assets subject to their own notices where indicated.

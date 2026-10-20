@@ -1,5 +1,14 @@
 export const COPY = {
-  nav: {train:'Play',market:'Market',review:'Review',progress:'Progress'},
+  nav: {train:'Play',market:'Market lab',review:'Review',progress:'Progress'},
+  market: {
+    eyebrow:'MARKET LAB',title:'Explore a market-shaped path.',
+    description:'Compare four synthetic crypto markets without placing a trade. These are illustrative values, not live prices.',
+    sample:'Synthetic sample',refresh:'Refresh sample',loading:'Loading sample…',unavailable:'Sample unavailable',
+    waiting:'Preparing sample',lastCandle:'Last simulated candle',chartUnavailable:'The sample chart is unavailable.',
+    feedError:'The sample could not be loaded. Please try again.',
+    chartNote:'Each candle represents 15 simulated minutes. Chart styles change the view, not the underlying sample.',
+    notice:'All prices, volumes, and charts here are generated examples. They are not live quotes or historical market data. Training rounds use separate synthetic paths and cannot place real orders.',
+  },
   actions: {buy:'Buy',wait:'Wait',hold:'Hold',halve:'Sell half',sell:'Sell'},
   flow: {
     heading:'What would you do?', instruction:'Swipe or use the arrows. Choose one move.',confirmHeading:'Confirm your move',
