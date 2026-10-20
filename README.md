@@ -12,7 +12,7 @@ The homepage at `/` introduces two paths and includes an interactive decision pr
 - A synthetic market lab with charts for BTC, ETH, SOL, and XRP. Its sample values are not live or historical quotes and are separate from simulated trade execution.
 - An opt-in email form stored in D1. No automated email campaign is connected.
 - Optional ChatGPT account sign-in. Guests can play without an account; signing in claims this browser's guest rounds and lets the same account reopen its journal on another device.
-- A private `/admin` visitor dashboard with page views, unique visitors, signed-in visitors, and early-access totals. The account owner is configured with `ITERALPHA_ADMIN_USER_ID`; the route and report API check this on the server.
+- A private `/admin` visitor dashboard with page views, unique visitors, signed-in visitors, and early-access totals. The account owner is configured with `ITERALPHA_ADMIN_EMAIL` or `ITERALPHA_ADMIN_USER_ID`; the route and report API check this on the server.
 
 The site records visited sections and timestamps. Signed-in visits include the account email; guest visits use a one-way anonymous identifier. IP addresses are not stored in this log. The dashboard shows the last 30 days and older entries are pruned as new visits arrive. Multiple visits by one visitor to the same section within 15 minutes count once.
 
@@ -37,7 +37,7 @@ Open the local URL printed by Wrangler, usually `http://127.0.0.1:8787/`. Apply 
 
 No AI key is required for the demo. To enable the optional coach, set `OPENAI_API_KEY` and `OPENAI_MODEL` as server-side secrets in your own runtime. See [.env.example](.env.example) and [the integration guide](docs/INTEGRATION-GUIDE.md). Never expose a key in the browser or commit it to Git.
 
-The hosted demo uses Sites' built-in ChatGPT sign-in. This is not a standalone email/password account system. Set `ITERALPHA_ADMIN_USER_ID` to the site owner's authenticated account user ID in the production runtime before using `/admin`. If it is unset, the admin page stays inaccessible.
+The hosted demo uses Sites' built-in ChatGPT sign-in. This is not a standalone email/password account system. Set `ITERALPHA_ADMIN_EMAIL` to the site owner's verified sign-in email, or `ITERALPHA_ADMIN_USER_ID` to the authenticated Site user ID, in the production runtime before using `/admin`. If neither matches, the admin page stays inaccessible.
 
 ## Project layout
 

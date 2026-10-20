@@ -108,11 +108,11 @@ test('visit records deduplicate, stay anonymous for guests, and require owner id
   const signedHeaders={'oai-authenticated-user-id':'owner-123','oai-authenticated-user-email':'owner@example.com','origin':'http://localhost','content-type':'application/json','x-iteralpha-request':'1'};
   const signedVisit=await handleApi(new Request('http://localhost/api/visit',{method:'POST',headers:signedHeaders,body:JSON.stringify({page:'training'})}),{DB:db,ITERALPHA_ADMIN_USER_ID:'owner-123'});
   assert.equal(signedVisit.status,201);
-  const outsider=await handleApi(new Request('http://localhost/api/admin/visits',{headers:{'oai-authenticated-user-id':'other'}}),{DB:db,ITERALPHA_ADMIN_USER_ID:'owner-123'});
+  const outsider=await handleApi(new Request('http://localhost/api/admin/visits',{headers:{'oai-authenticated-user-id':'other','oai-authenticated-user-email':'other@example.com'}}),{DB:db,ITERALPHA_ADMIN_USER_ID:'owner-123',ITERALPHA_ADMIN_EMAIL:'owner@example.com'});
   assert.equal(outsider.status,404);
-  const noConfig=await handleApi(new Request('http://localhost/api/admin/visits',{headers:{'oai-authenticated-user-id':'owner-123'}}),{DB:db});
+  const noConfig=await handleApi(new Request('http://localhost/api/admin/visits',{headers:{'oai-authenticated-user-id':'owner-123','oai-authenticated-user-email':'owner@example.com'}}),{DB:db});
   assert.equal(noConfig.status,404);
-  const reportResponse=await handleApi(new Request('http://localhost/api/admin/visits',{headers:{'oai-authenticated-user-id':'owner-123'}}),{DB:db,ITERALPHA_ADMIN_USER_ID:'owner-123'});
+  const reportResponse=await handleApi(new Request('http://localhost/api/admin/visits',{headers:{'oai-authenticated-user-id':'site-specific-owner','oai-authenticated-user-email':'Owner@Example.com'}}),{DB:db,ITERALPHA_ADMIN_EMAIL:'owner@example.com'});
   assert.equal(reportResponse.status,200);
   const report=await reportResponse.json() as any;
   assert.equal(report.summary.views,2);

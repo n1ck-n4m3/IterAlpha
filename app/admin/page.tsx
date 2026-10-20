@@ -4,14 +4,15 @@ import {env} from 'cloudflare:workers';
 import {requireChatGPTUser} from '../chatgpt-auth';
 import {Repository} from '../../lib/server/repository';
 import {ACCOUNT_COPY as C} from '../../lib/account-copy';
+import {isSiteAdmin} from '../../lib/server/admin-auth';
 import styles from './page.module.css';
 
 export const dynamic='force-dynamic';
 
 export default async function AdminPage(){
   const user=await requireChatGPTUser('/admin');
-  const runtime=env as {ITERALPHA_ADMIN_USER_ID?:string;DB?:D1Database};
-  if(!runtime.ITERALPHA_ADMIN_USER_ID||user.userId!==runtime.ITERALPHA_ADMIN_USER_ID)notFound();
+  const runtime=env as {ITERALPHA_ADMIN_USER_ID?:string;ITERALPHA_ADMIN_EMAIL?:string;DB?:D1Database};
+  if(!isSiteAdmin(user,runtime))notFound();
   if(!runtime.DB)return <main className={styles.root}><p>Visitor storage is unavailable.</p></main>;
   const report=await new Repository(runtime.DB).visitReport(new Date().toISOString());
   return <main className={styles.root}>

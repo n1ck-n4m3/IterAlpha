@@ -5,8 +5,9 @@ import { generatedSceneId, getScene, summaries, view } from './scenes.ts';
 import { history, progress } from './progress.ts';
 import { coachFeedback, ruleFeedback, ruleStepFeedback, stepCoachFeedback } from './coach.ts';
 import { marketAssets, syntheticMarketSnapshot } from './synthetic-market.ts';
+import {isSiteAdmin} from './admin-auth.ts';
 
-interface ApiEnvironment { DB?: D1Database; OPENAI_API_KEY?: string; OPENAI_MODEL?: string; ITERALPHA_ADMIN_USER_ID?: string }
+interface ApiEnvironment { DB?: D1Database; OPENAI_API_KEY?: string; OPENAI_MODEL?: string; ITERALPHA_ADMIN_USER_ID?: string; ITERALPHA_ADMIN_EMAIL?: string }
 const decisionSchema = z.object({action:z.enum(['buy','wait','hold','halve','sell']),riskPercent:z.number().finite().optional(),amountUsd:z.number().finite().optional(),sellPercent:z.number().finite().min(1).max(100).optional(),stopPrice:z.number().finite().optional(),reason:z.enum(['Price structure','Defined risk','Need confirmation','Event uncertainty']).optional(),thesis:z.string().trim().max(300).optional(),version:z.number().int().min(0).max(8),requestId:z.string().uuid()}).strict();
 const startSchema = z.object({sceneId:z.string().max(80).optional(),asset:z.enum(['BTC','ETH','random']).optional(),paceHours:z.union([z.literal(0.25),z.literal(1),z.literal(4)]).optional(),initialCash:z.number().int().min(100).max(1_000_000).optional(),track:z.enum(['foundations','advanced']).optional(),requestId:z.string().uuid()}).strict();
 const coachSchema = z.object({requestId:z.string().uuid(),question:z.string().trim().max(300).default('')}).strict();
@@ -57,7 +58,7 @@ export async function handleApi(request: Request, env: ApiEnvironment): Promise<
       return json({ok:true},201);
     }
     if(path==='/api/admin/visits'){
-      if(!env.ITERALPHA_ADMIN_USER_ID||request.headers.get('oai-authenticated-user-id')!==env.ITERALPHA_ADMIN_USER_ID)throw new TrainingError('Not found.',404);
+      if(!isSiteAdmin({userId:request.headers.get('oai-authenticated-user-id'),email:request.headers.get('oai-authenticated-user-email')},env))throw new TrainingError('Not found.',404);
       if(request.method!=='GET')throw new TrainingError('Method not allowed.',405);
       return json(await repo.visitReport(new Date().toISOString()));
     }
