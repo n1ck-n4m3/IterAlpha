@@ -6,12 +6,14 @@ import { history, progress } from './progress.ts';
 import { coachFeedback, ruleFeedback, ruleStepFeedback, stepCoachFeedback } from './coach.ts';
 import { marketAssets, syntheticMarketSnapshot } from './synthetic-market.ts';
 
-interface ApiEnvironment { DB?: D1Database; OPENAI_API_KEY?: string; OPENAI_MODEL?: string }
+interface ApiEnvironment { DB?: D1Database; OPENAI_API_KEY?: string; OPENAI_MODEL?: string; ITERALPHA_ADMIN_USER_ID?: string }
 const decisionSchema = z.object({action:z.enum(['buy','wait','hold','halve','sell']),riskPercent:z.number().finite().optional(),amountUsd:z.number().finite().optional(),sellPercent:z.number().finite().min(1).max(100).optional(),stopPrice:z.number().finite().optional(),reason:z.enum(['Price structure','Defined risk','Need confirmation','Event uncertainty']).optional(),thesis:z.string().trim().max(300).optional(),version:z.number().int().min(0).max(8),requestId:z.string().uuid()}).strict();
 const startSchema = z.object({sceneId:z.string().max(80).optional(),asset:z.enum(['BTC','ETH','random']).optional(),paceHours:z.union([z.literal(0.25),z.literal(1),z.literal(4)]).optional(),initialCash:z.number().int().min(100).max(1_000_000).optional(),track:z.enum(['foundations','advanced']).optional(),requestId:z.string().uuid()}).strict();
 const coachSchema = z.object({requestId:z.string().uuid(),question:z.string().trim().max(300).default('')}).strict();
 const stepCoachSchema=z.object({requestId:z.string().uuid()}).strict();
 const signupSchema = z.object({email:z.string().trim().email().max(254),track:z.enum(['foundations','advanced','undecided']),source:z.enum(['home','foundations','advanced']),consent:z.literal(true),website:z.string().max(100).optional()}).strict();
+const visitSchema = z.object({page:z.enum(['home','training','market','review','progress'])}).strict();
+async function visitorHash(owner:string){const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(owner));return Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');}
 function identity(request: Request) {
   const signedIn = request.headers.get('oai-authenticated-user-id');
   if (signedIn) return {owner:`chatgpt:${signedIn}`,cookie:null};
@@ -48,12 +50,27 @@ export async function handleApi(request: Request, env: ApiEnvironment): Promise<
     }
     if(!env.DB)throw new TrainingError('Training storage is unavailable. Please try again shortly.',503);
     const repo=new Repository(env.DB);
+    if(path==='/api/visit'&&request.method==='POST'){
+      const input=visitSchema.parse(await readBody(request));
+      const email=user.owner.startsWith('chatgpt:')?(request.headers.get('oai-authenticated-user-email')?.slice(0,254)??null):null;
+      await repo.recordVisit(await visitorHash(user.owner),email,input.page,new Date().toISOString());
+      return json({ok:true},201);
+    }
+    if(path==='/api/admin/visits'){
+      if(!env.ITERALPHA_ADMIN_USER_ID||request.headers.get('oai-authenticated-user-id')!==env.ITERALPHA_ADMIN_USER_ID)throw new TrainingError('Not found.',404);
+      if(request.method!=='GET')throw new TrainingError('Method not allowed.',405);
+      return json(await repo.visitReport(new Date().toISOString()));
+    }
     if(path==='/api/early-access'&&request.method==='POST'){
       const input=signupSchema.parse(await readBody(request));
       if(!input.website)await repo.signUp(input.email.toLowerCase(),input.track,input.source,new Date().toISOString());
       return json({ok:true,message:'You are on the early access list. Thank you for helping shape IterAlpha.'},201);
     }
     if(path==='/api/bootstrap'&&request.method==='GET'){
+      if(user.owner.startsWith('chatgpt:')){
+        const guestToken=request.headers.get('cookie')?.match(/(?:^|;\s*)iteralpha_guest=([a-f0-9]{64})(?:;|$)/)?.[1];
+        if(guestToken)await repo.claimGuestSessions(`guest:${guestToken}`,user.owner);
+      }
       const sessions=await repo.list(user.owner);const active=sessions.find(s=>s.status==='active');
       return json({scenes:summaries(),active:active?view(active):null,history:history(sessions),progress:progress(sessions),rules:RULES,aiConfigured:!!env.OPENAI_API_KEY&&!!env.OPENAI_MODEL,identity:user.owner.startsWith('chatgpt:')?'signed-in':'guest'});
     }

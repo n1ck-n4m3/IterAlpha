@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./landing.css";
 import "./visual-system.css";
+import VisitTracker from '../components/visit-tracker';
 
 export const metadata: Metadata = {
   title: "IterAlpha — Train your judgment",
@@ -19,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">{children}<VisitTracker/></body>
     </html>
   );
 }

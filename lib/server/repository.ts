@@ -4,6 +4,35 @@ import { TrainingError } from '../training/engine.ts';
 export class Repository {
   db: D1Database;
   constructor(db: D1Database) { this.db = db; }
+  async recordVisit(visitorHash: string, email: string | null, page: string, now: string) {
+    const bucket = Math.floor(Date.parse(now) / 900_000);
+    await this.db.prepare('INSERT OR IGNORE INTO site_visits (id, visitor_hash, email, page, bucket, occurred_at) VALUES (?, ?, ?, ?, ?, ?)')
+      .bind(crypto.randomUUID(),visitorHash,email,page,bucket,now).run();
+    await this.db.prepare('DELETE FROM site_visits WHERE occurred_at < ?')
+      .bind(new Date(Date.parse(now)-30*24*60*60*1000).toISOString()).run();
+  }
+  async visitReport(now: string) {
+    const since = new Date(Date.parse(now)-30*24*60*60*1000).toISOString();
+    const summary = await this.db.prepare(`SELECT COUNT(*) AS views, COUNT(DISTINCT visitor_hash) AS visitors,
+      COUNT(DISTINCT CASE WHEN email IS NOT NULL THEN visitor_hash END) AS accounts
+      FROM site_visits WHERE occurred_at >= ?`).bind(since).first<{views:number;visitors:number;accounts:number}>();
+    const pages = await this.db.prepare('SELECT page, COUNT(*) AS views FROM site_visits WHERE occurred_at >= ? GROUP BY page ORDER BY views DESC')
+      .bind(since).all<{page:string;views:number}>();
+    const visits = await this.db.prepare('SELECT email, page, occurred_at, substr(visitor_hash,1,12) AS visitor FROM site_visits WHERE occurred_at >= ? ORDER BY occurred_at DESC LIMIT 100')
+      .bind(since).all<{email:string|null;page:string;occurred_at:string;visitor:string}>();
+    const leads = await this.db.prepare('SELECT COUNT(*) AS total FROM early_access_signups').first<{total:number}>();
+    return {summary:summary??{views:0,visitors:0,accounts:0},pages:pages.results,visits:visits.results,leads:leads?.total??0};
+  }
+  async claimGuestSessions(guestOwner: string, signedOwner: string) {
+    if (guestOwner===signedOwner) return;
+    const rows=await this.db.prepare('SELECT id, payload FROM sessions WHERE owner = ?').bind(guestOwner).all<{id:string;payload:string}>();
+    for (const row of rows.results) {
+      const session=JSON.parse(row.payload) as Session;
+      session.owner=signedOwner;
+      await this.db.prepare('UPDATE sessions SET owner = ?, payload = ? WHERE id = ? AND owner = ?')
+        .bind(signedOwner,JSON.stringify(session),row.id,guestOwner).run();
+    }
+  }
   async signUp(email: string, track: 'foundations' | 'advanced' | 'undecided', source: string, now: string) {
     await this.db.prepare(`INSERT INTO early_access_signups (email,track,source,consent_at,created_at,updated_at)
       VALUES (?,?,?,?,?,?) ON CONFLICT(email) DO UPDATE SET track = excluded.track, source = excluded.source,

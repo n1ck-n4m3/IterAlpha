@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 export const sessions = sqliteTable('sessions', {
   id: text('id').primaryKey(), owner: text('owner').notNull(), sceneId: text('scene_id').notNull(),
@@ -15,3 +15,15 @@ export const earlyAccessSignups = sqliteTable('early_access_signups', {
   email: text('email').primaryKey(), track: text('track').notNull(), source: text('source').notNull(),
   consentAt: text('consent_at').notNull(), createdAt: text('created_at').notNull(), updatedAt: text('updated_at').notNull(),
 });
+
+export const siteVisits = sqliteTable('site_visits', {
+  id: text('id').primaryKey(),
+  visitorHash: text('visitor_hash').notNull(),
+  email: text('email'),
+  page: text('page').notNull(),
+  bucket: integer('bucket').notNull(),
+  occurredAt: text('occurred_at').notNull(),
+}, table => [
+  uniqueIndex('site_visits_visitor_page_bucket').on(table.visitorHash, table.page, table.bucket),
+  index('site_visits_occurred_at').on(table.occurredAt),
+]);

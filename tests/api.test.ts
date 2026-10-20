@@ -96,6 +96,46 @@ test('early access requires consent and saves a normalized email once',async()=>
   const row=await db.prepare('SELECT email, track, source FROM early_access_signups WHERE email = ?').bind('trader@example.com').first() as {email:string;track:string;source:string};
   assert.deepEqual({...row},{email:'trader@example.com',track:'advanced',source:'home'});
 });
+test('visit records deduplicate, stay anonymous for guests, and require owner identity for reports',async()=>{
+  const db=database();
+  const guest=await browser(db);
+  assert.equal((await guest('/api/visit',{page:'home'})).status,201);
+  assert.equal((await guest('/api/visit',{page:'home'})).status,201);
+  assert.equal((await guest('/api/visit',{page:'unknown'})).status,400);
+  const guestRow=await db.prepare('SELECT visitor_hash, email FROM site_visits').first() as {visitor_hash:string;email:string|null};
+  assert.equal(guestRow.visitor_hash.length,64);
+  assert.equal(guestRow.email,null);
+  const signedHeaders={'oai-authenticated-user-id':'owner-123','oai-authenticated-user-email':'owner@example.com','origin':'http://localhost','content-type':'application/json','x-iteralpha-request':'1'};
+  const signedVisit=await handleApi(new Request('http://localhost/api/visit',{method:'POST',headers:signedHeaders,body:JSON.stringify({page:'training'})}),{DB:db,ITERALPHA_ADMIN_USER_ID:'owner-123'});
+  assert.equal(signedVisit.status,201);
+  const outsider=await handleApi(new Request('http://localhost/api/admin/visits',{headers:{'oai-authenticated-user-id':'other'}}),{DB:db,ITERALPHA_ADMIN_USER_ID:'owner-123'});
+  assert.equal(outsider.status,404);
+  const noConfig=await handleApi(new Request('http://localhost/api/admin/visits',{headers:{'oai-authenticated-user-id':'owner-123'}}),{DB:db});
+  assert.equal(noConfig.status,404);
+  const reportResponse=await handleApi(new Request('http://localhost/api/admin/visits',{headers:{'oai-authenticated-user-id':'owner-123'}}),{DB:db,ITERALPHA_ADMIN_USER_ID:'owner-123'});
+  assert.equal(reportResponse.status,200);
+  const report=await reportResponse.json() as any;
+  assert.equal(report.summary.views,2);
+  assert.equal(report.summary.visitors,2);
+  assert.equal(report.summary.accounts,1);
+  assert.equal(report.visits.find((item:{email:string|null})=>item.email).email,'owner@example.com');
+});
+test('signing in claims only rounds from the current guest cookie',async()=>{
+  const db=database();
+  const initial=await handleApi(new Request('http://localhost/api/bootstrap'),{DB:db});
+  const cookie=initial.headers.get('set-cookie')!.split(';')[0];
+  const requestId=crypto.randomUUID();
+  const start=await handleApi(new Request('http://localhost/api/sessions',{method:'POST',headers:{cookie,origin:'http://localhost','content-type':'application/json','x-iteralpha-request':'1'},body:JSON.stringify({requestId})}),{DB:db});
+  assert.equal(start.status,201);
+  const signed=await handleApi(new Request('http://localhost/api/bootstrap',{headers:{cookie,'oai-authenticated-user-id':'new-account'}}),{DB:db});
+  assert.equal(signed.status,200);
+  const body=await signed.json() as any;
+  assert.equal(body.identity,'signed-in');
+  assert.equal(body.active.id,requestId);
+  const saved=await db.prepare('SELECT owner, payload FROM sessions WHERE id = ?').bind(requestId).first() as {owner:string;payload:string};
+  assert.equal(saved.owner,'chatgpt:new-account');
+  assert.equal(JSON.parse(saved.payload).owner,saved.owner);
+});
 test('Coinbase candle parser keeps valid chronological OHLC bars only',()=>{
   assert.deepEqual(parseCoinbaseCandles([[2000,90,110,100,105,12],[1000,80,100,90,95,8],[3000,90,80,85,88,5],['bad',1,2,1,2,1]]).map(c=>c.time),[1000,2000]);
 });

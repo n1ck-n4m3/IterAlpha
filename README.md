@@ -11,6 +11,10 @@ The homepage at `/` introduces two paths and includes an interactive decision pr
 - A decision-by-decision review, rule-based process feedback, a journal, and JSON export. AI coaching is optional and not enabled without server credentials.
 - A synthetic market lab with charts for BTC, ETH, SOL, and XRP. Its sample values are not live or historical quotes and are separate from simulated trade execution.
 - An opt-in email form stored in D1. No automated email campaign is connected.
+- Optional ChatGPT account sign-in. Guests can play without an account; signing in claims this browser's guest rounds and lets the same account reopen its journal on another device.
+- A private `/admin` visitor dashboard with page views, unique visitors, signed-in visitors, and early-access totals. The account owner is configured with `ITERALPHA_ADMIN_USER_ID`; the route and report API check this on the server.
+
+The site records visited sections and timestamps. Signed-in visits include the account email; guest visits use a one-way anonymous identifier. IP addresses are not stored in this log. The dashboard shows the last 30 days and older entries are pruned as new visits arrive. Multiple visits by one visitor to the same section within 15 minutes count once.
 
 Synthetic practice paths are **not historical replays**. Each checkpoint separates visible price, range, and volume calculations from teaching interpretations and unknowns. The homepage preview is illustrative and does not save a trade. The project includes a historical snapshot adapter and a dormant Coinbase integration adapter; neither supplies prices to the public test. Using real data requires suitable storage and display rights plus reviewed snapshots. No brokerage account is connected.
 
@@ -25,12 +29,15 @@ npm test
 npm run build
 node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_long_multiple_man.sql
 node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_bizarre_joystick.sql
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0002_concerned_pete_wisdom.sql
 npm run start
 ```
 
 Open the local URL printed by Wrangler, usually `http://127.0.0.1:8787/`. Apply each migration only once to a given local database. Local data is separate from any deployed site's D1 database.
 
 No AI key is required for the demo. To enable the optional coach, set `OPENAI_API_KEY` and `OPENAI_MODEL` as server-side secrets in your own runtime. See [.env.example](.env.example) and [the integration guide](docs/INTEGRATION-GUIDE.md). Never expose a key in the browser or commit it to Git.
+
+The hosted demo uses Sites' built-in ChatGPT sign-in. This is not a standalone email/password account system. Set `ITERALPHA_ADMIN_USER_ID` to the site owner's authenticated account user ID in the production runtime before using `/admin`. If it is unset, the admin page stays inaccessible.
 
 ## Project layout
 
