@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./landing.css";
+import "./visual-system.css";
 
 export const metadata: Metadata = {
   title: "IterAlpha — Train your judgment",

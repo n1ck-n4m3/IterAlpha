@@ -55,16 +55,25 @@ test('Play generates a fresh reconstructable scene with chosen capital and check
   for(let i=0;i<first.data.nodeCount;i++){const result=await visit(`/api/sessions/${firstId}/decisions`,{action:'wait',version:i,requestId:crypto.randomUUID()});assert.equal(result.status,200);current=result.data;}
   assert.equal(current.status,'completed');assert.equal(current.account.cash,25_000);assert.equal(current.outcome.netPnl,0);assert.equal(current.outcome.returnPercent,0);
 });
-test('training tracks persist and advanced practice requires a recorded thesis',async()=>{
+test('advanced practice persists without requiring typed reasoning',async()=>{
   const visit=await browser(database());const id=crypto.randomUUID();
   const start=await visit('/api/sessions',{requestId:id,track:'advanced',paceHours:4});
   assert.equal(start.status,201);assert.equal(start.data.track,'advanced');assert.equal(start.data.nodeCount,8);
   assert.equal((await visit(`/api/sessions/${id}`)).data.track,'advanced');
   assert.equal((await visit('/api/sessions',{requestId:id,track:'foundations',paceHours:4})).status,409);
-  assert.equal((await visit(`/api/sessions/${id}/decisions`,{action:'wait',version:0,requestId:crypto.randomUUID()})).status,400);
-  const input={action:'wait',version:0,requestId:crypto.randomUUID(),reason:'Need confirmation',thesis:'The setup lacks confirmation at this checkpoint.'};
+  assert.equal((await visit(`/api/sessions/${id}/decisions`,{action:'wait',version:0,requestId:crypto.randomUUID()})).status,200);
+  const input={action:'wait',version:1,requestId:crypto.randomUUID(),reason:'Need confirmation'};
   const decision=await visit(`/api/sessions/${id}/decisions`,input);
-  assert.equal(decision.status,200);assert.equal(decision.data.decisions[0].input.thesis,input.thesis);
+  assert.equal(decision.status,200);assert.equal(decision.data.decisions[1].input.reason,input.reason);
+});
+test('step coach gives a saved-decision cue without an AI key',async()=>{
+  const visit=await browser(database());const id=crypto.randomUUID();
+  assert.equal((await visit('/api/sessions',{requestId:id,track:'foundations'})).status,201);
+  assert.equal((await visit(`/api/sessions/${id}/step-coach`)).status,409);
+  assert.equal((await visit(`/api/sessions/${id}/decisions`,{action:'wait',version:0,requestId:crypto.randomUUID()})).status,200);
+  const reply=await visit(`/api/sessions/${id}/step-coach`,{requestId:crypto.randomUUID()});
+  assert.equal(reply.status,200);assert.equal(reply.data.mode,'rules');assert.match(reply.data.takeaway,/Waiting/);
+  assert.equal((await visit(`/api/sessions/${id}/step-coach`)).data.mode,'rules');
 });
 test('fifteen-minute rounds reveal only one new candle at each decision',async()=>{
   const visit=await browser(database());const id=crypto.randomUUID();

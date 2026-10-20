@@ -3,13 +3,14 @@ import { TrainingError, advanceSession, createSession, RULES } from '../training
 import { Repository } from './repository.ts';
 import { generatedSceneId, getScene, summaries, view } from './scenes.ts';
 import { history, progress } from './progress.ts';
-import { coachFeedback, ruleFeedback } from './coach.ts';
+import { coachFeedback, ruleFeedback, ruleStepFeedback, stepCoachFeedback } from './coach.ts';
 import { marketAssets, marketSnapshot } from './live-market.ts';
 
 interface ApiEnvironment { DB?: D1Database; OPENAI_API_KEY?: string; OPENAI_MODEL?: string }
-const decisionSchema = z.object({action:z.enum(['buy','wait','hold','halve','sell']),riskPercent:z.number().finite().optional(),amountUsd:z.number().finite().optional(),stopPrice:z.number().finite().optional(),reason:z.enum(['Price structure','Defined risk','Need confirmation','Event uncertainty']).optional(),thesis:z.string().trim().max(300).optional(),version:z.number().int().min(0).max(8),requestId:z.string().uuid()}).strict();
+const decisionSchema = z.object({action:z.enum(['buy','wait','hold','halve','sell']),riskPercent:z.number().finite().optional(),amountUsd:z.number().finite().optional(),sellPercent:z.number().finite().min(1).max(100).optional(),stopPrice:z.number().finite().optional(),reason:z.enum(['Price structure','Defined risk','Need confirmation','Event uncertainty']).optional(),thesis:z.string().trim().max(300).optional(),version:z.number().int().min(0).max(8),requestId:z.string().uuid()}).strict();
 const startSchema = z.object({sceneId:z.string().max(80).optional(),asset:z.enum(['BTC','ETH','random']).optional(),paceHours:z.union([z.literal(0.25),z.literal(1),z.literal(4)]).optional(),initialCash:z.number().int().min(100).max(1_000_000).optional(),track:z.enum(['foundations','advanced']).optional(),requestId:z.string().uuid()}).strict();
 const coachSchema = z.object({requestId:z.string().uuid(),question:z.string().trim().max(300).default('')}).strict();
+const stepCoachSchema=z.object({requestId:z.string().uuid()}).strict();
 const signupSchema = z.object({email:z.string().trim().email().max(254),track:z.enum(['foundations','advanced','undecided']),source:z.enum(['home','foundations','advanced']),consent:z.literal(true),website:z.string().max(100).optional()}).strict();
 function identity(request: Request) {
   const signedIn = request.headers.get('oai-authenticated-user-id');
@@ -65,7 +66,7 @@ export async function handleApi(request: Request, env: ApiEnvironment): Promise<
     }
     if(path==='/api/history'&&request.method==='GET')return json(history(await repo.list(user.owner)));
     if(path==='/api/progress'&&request.method==='GET')return json(progress(await repo.list(user.owner)));
-    const match=path.match(/^\/api\/sessions\/([0-9a-f-]{36})(?:\/(decisions|coach))?$/);
+    const match=path.match(/^\/api\/sessions\/([0-9a-f-]{36})(?:\/(decisions|coach|step-coach))?$/);
     if(!match)throw new TrainingError('Not found.',404);
     const session=await repo.find(user.owner,match[1]);if(!session)throw new TrainingError('Session not found.',404);
     const scene=getScene(session.sceneId)!;
@@ -78,6 +79,23 @@ export async function handleApi(request: Request, env: ApiEnvironment): Promise<
         throw new TrainingError('Another decision was saved first. Refresh to continue.',409);
       }
       return json(view(next));
+    }
+    if(match[2]==='step-coach'&&(request.method==='GET'||request.method==='POST')){
+      if(!session.decisions.length)throw new TrainingError('Save a decision before requesting a coach cue.',409);
+      const key=`${session.id}:step:${session.version}`;
+      const cached=await repo.coach(user.owner,session.id,key);
+      if(cached?.response)return json(JSON.parse(cached.response));
+      if(request.method==='GET')return json(ruleStepFeedback(session));
+      stepCoachSchema.parse(await readBody(request));
+      if(!env.OPENAI_API_KEY||!env.OPENAI_MODEL)return json(ruleStepFeedback(session));
+      if(cached){
+        if(Date.now()-Date.parse(cached.created_at)<20000) return json(ruleStepFeedback(session,'AI coach is preparing feedback. Showing a rule-based cue for now.'));
+        const fallback=ruleStepFeedback(session,'The earlier AI request was interrupted. Showing rule-based feedback.');
+        await repo.finishCoach(user.owner,key,fallback);return json(fallback);
+      }
+      if(!await repo.reserveStepCoach(user.owner,session.id,key,new Date().toISOString()))return json(ruleStepFeedback(session,'Coach limit reached. Showing rule-based feedback.'));
+      const reply=await stepCoachFeedback(session,scene,{key:env.OPENAI_API_KEY,model:env.OPENAI_MODEL});
+      await repo.finishCoach(user.owner,key,reply);return json(reply);
     }
     if(match[2]==='coach'&&request.method==='GET')return json(await repo.coaching(user.owner,session.id));
     if(match[2]==='coach'&&request.method==='POST'){

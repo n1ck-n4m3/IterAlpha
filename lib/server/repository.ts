@@ -40,15 +40,22 @@ export class Repository {
     return this.db.prepare('SELECT question, status, response, created_at FROM coach_requests WHERE id = ? AND owner = ? AND session_id = ?').bind(id,owner,sessionId).first<{question:string;status:string;response:string|null;created_at:string}>();
   }
   async coaching(owner: string, sessionId: string): Promise<CoachReply[]> {
-    const rows = await this.db.prepare('SELECT response FROM coach_requests WHERE owner = ? AND session_id = ? AND status = ? ORDER BY created_at ASC').bind(owner,sessionId,'completed').all<{response:string}>();
+    const rows = await this.db.prepare("SELECT response FROM coach_requests WHERE owner = ? AND session_id = ? AND status = ? AND id NOT LIKE '%:step:%' ORDER BY created_at ASC").bind(owner,sessionId,'completed').all<{response:string}>();
     return rows.results.map(row=>JSON.parse(row.response));
   }
   async reserveCoach(owner: string, sessionId: string, id: string, question: string, now: string) {
     const result = await this.db.prepare(`INSERT OR IGNORE INTO coach_requests (id,owner,session_id,question,status,created_at)
       SELECT ?,?,?,?,'pending',? WHERE (SELECT COUNT(*) FROM coach_requests WHERE owner = ? AND created_at >= ?) < 20
-      AND (SELECT COUNT(*) FROM coach_requests WHERE owner = ? AND session_id = ?) < 4`)
+      AND (SELECT COUNT(*) FROM coach_requests WHERE owner = ? AND session_id = ? AND id NOT LIKE '%:step:%') < 4`)
       .bind(id,owner,sessionId,question,now,owner,now.slice(0,10),owner,sessionId).run();
     return result.meta.changes === 1;
+  }
+  async reserveStepCoach(owner:string,sessionId:string,id:string,now:string){
+    const result=await this.db.prepare(`INSERT OR IGNORE INTO coach_requests (id,owner,session_id,question,status,created_at)
+      SELECT ?,?,?,'','pending',? WHERE (SELECT COUNT(*) FROM coach_requests WHERE owner = ? AND created_at >= ?) < 20
+      AND (SELECT COUNT(*) FROM coach_requests WHERE owner = ? AND session_id = ? AND id LIKE ?) < 8`)
+      .bind(id,owner,sessionId,now,owner,now.slice(0,10),owner,sessionId,`${sessionId}:step:%`).run();
+    return result.meta.changes===1;
   }
   async finishCoach(owner: string, id: string, reply: CoachReply) {
     await this.db.prepare('UPDATE coach_requests SET status = ?, response = ? WHERE id = ? AND owner = ?').bind('completed',JSON.stringify(reply),id,owner).run();

@@ -49,7 +49,7 @@ export function advanceSession(original: Session, scene: Scene, input: DecisionI
   if (original.sceneVersion !== scene.version || original.dataVersion !== scene.source.version) throw new TrainingError('This scene has changed. Start a new session.', 409);
   if (input.version !== original.version) throw new TrainingError('Your session changed in another tab. Refresh to continue.', 409);
   if (!allowedActions(original).includes(input.action)) throw new TrainingError('This action is not available for the current position.');
-  if (original.track === 'advanced' && (!input.reason || !input.thesis || input.thesis.trim().length < 10)) throw new TrainingError('Advanced practice requires a decision reason and a journal note of at least 10 characters.');
+  if (input.sellPercent !== undefined && (input.action !== 'sell' || !Number.isFinite(input.sellPercent) || input.sellPercent < 1 || input.sellPercent > 100)) throw new TrainingError('Choose a sell size between 1% and 100%.');
   const price = scene.candles[original.cursor].close;
   const stop = input.stopPrice ?? 0;
   const risk = input.riskPercent ?? 0;
@@ -96,8 +96,9 @@ export function advanceSession(original: Session, scene: Scene, input: DecisionI
       }
     }
     if (first && session.quantity > 0 && (input.action === 'halve' || input.action === 'sell')) {
-      sell(session, input.action === 'halve' ? session.quantity / 2 : session.quantity, candle.open, candle.time, input.action === 'halve' ? 'reduce' : 'exit');
-      note = input.action === 'halve' ? 'Reduced the position by half at the next open.' : 'Closed the position at the next open.';
+      const percent = input.action === 'halve' ? 50 : input.sellPercent ?? 100;
+      sell(session, session.quantity * percent / 100, candle.open, candle.time, percent === 100 ? 'exit' : 'reduce');
+      note = percent === 100 ? 'Closed the position at the next open.' : `Reduced the position by ${percent}% at the next open.`;
     }
     if (session.quantity && session.stopPrice !== null && candle.low <= session.stopPrice) sell(session, session.quantity, Math.min(candle.open, session.stopPrice), candle.time, 'stop');
     session.marks.push({time: candle.time + scene.source.intervalSeconds, equity: session.cash + session.quantity * candle.close});
@@ -148,16 +149,16 @@ export function evaluate(session: Session, scene: Scene): Outcome {
       decision.input.action === 'buy' ? `The order spent $${spent.toFixed(2)} including fees. The recorded stop stayed in place.` :
       decision.input.action === 'wait' ? 'You stayed in cash for this interval.' :
       decision.input.action === 'hold' ? 'You kept the existing position and its stop.' :
-      decision.input.action === 'halve' ? 'You reduced exposure by half at the next open.' : 'You closed the position at the next open.';
+      decision.input.action === 'halve' ? 'You reduced exposure by half at the next open.' : decision.input.sellPercent && decision.input.sellPercent < 100 ? `You reduced exposure by ${decision.input.sellPercent}% at the next open.` : 'You closed the position at the next open.';
     const comparison = alternateAction && hindsightDifference !== null && Math.abs(hindsightDifference) >= 0.01 ?
       ` On this revealed path, the result was $${Math.abs(hindsightDifference).toFixed(2)} ${hindsightDifference > 0 ? 'higher' : 'lower'} than ${alternateAction}. That does not, by itself, make the decision good or bad.` : '';
     const observation = baseObservation + comparison;
     const improvement = gapExceeded ? 'Before the next entry, leave room for price gaps or choose a smaller size.' :
-      decision.input.action === 'buy' && hindsightDifference !== null && hindsightDifference < -0.01 ? 'Before adding exposure again, write the specific confirmation available at the cutoff and compare it with the extra cost and risk.' :
-      decision.input.action === 'buy' ? 'Compare the planned spend and stop loss with the fill, then explain why this entry was justified at the cutoff.' :
-      decision.input.action === 'wait' || decision.input.action === 'hold' ? 'Name the information that would change this decision before seeing the next candles.' :
-      hindsightDifference !== null && hindsightDifference < -0.01 ? 'Write down what new evidence justified reducing exposure before the next candles appeared; compare that reason with simply keeping the original stop.' :
-      'Compare this exit with keeping the original stop; explain what new evidence changed your plan.';
+      decision.input.action === 'buy' && hindsightDifference !== null && hindsightDifference < -0.01 ? 'Before adding exposure again, identify the confirmation available at the cutoff and compare it with the extra cost and risk.' :
+      decision.input.action === 'buy' ? 'Compare the planned spend and stop loss with the fill, then identify which visible fact supported the entry.' :
+      decision.input.action === 'wait' || decision.input.action === 'hold' ? 'Identify the information that would change this decision before seeing the next candles.' :
+      hindsightDifference !== null && hindsightDifference < -0.01 ? 'Identify the new evidence that justified reducing exposure before the next candles appeared; compare it with keeping the original stop.' :
+      'Compare this exit with keeping the original stop; identify the evidence that changed your plan.';
     decisionReviews.push({node:decision.node,action:decision.input.action,segmentChange:actualEquity-decision.equityBefore,alternateAction,hindsightDifference,spent,received,fees,observation,improvement});
     replay = actual;
   }

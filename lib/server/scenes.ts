@@ -59,12 +59,13 @@ function generatedScene(id: string): Scene | undefined {
   const end = 63 + nodeCount * step;
   const base = (asset === 'BTC' ? 60_000 : 3_000) * (0.8 + (seed % 4001) / 10_000);
   const start = Date.parse('2026-01-01T00:00:00Z') / 1000 + (seed % 180) * 86_400;
-  const title = topic === 'trend' ? 'Trend decision' : topic === 'range' ? 'Range decision' : 'Volatility decision';
+  const titles = topic === 'trend' ? ['Momentum on pause','A second entry','The pullback test'] : topic === 'range' ? ['At the boundary','The quiet range','A failed break?'] : ['Volatility expands','After the shock','The uncertain open'];
+  const title = titles[seed % titles.length];
   const inference = topic === 'trend' ? 'Recent direction is visible, but it does not establish that the next move will continue.' : topic === 'range' ? 'A visible boundary may hold or break; neither outcome is guaranteed.' : 'A wider price range makes both opportunity and execution uncertainty larger.';
   const paceLabel = match[3];
   const generationVersion = nodeCount === 3 ? 'generated-v1' : 'generated-v2';
   const dataVersion = nodeCount === 3 ? `generated-v1-${seed}-${topic}-${paceHours}` : `${generationVersion}-${seed}-${topic}-${paceLabel}-${nodeCount}`;
-  return {id, asset, topic, title, subtitle:`Fresh ${asset} spot practice · ${paceLabel} checkpoints`, difficulty:'Adaptive practice', objective:'Choose an amount, preserve cash for later decisions, and explain the condition that would change your view.', minutes:nodeCount === 8 ? 12 : 9, mode:'synthetic', version:generationVersion, source:{mode:'synthetic',provider:'IterAlpha authored simulation',venue:'No exchange',symbol:`${asset}-USD`,intervalSeconds:900,retrievedAt:'2026-10-11T00:00:00Z',version:dataVersion,license:'Deterministic teaching data. These are not historical prices, volumes, or live quotes.'}, candles:generateCandles(seed,base,topic,start,end+1),nodes,end,inference,uncertainty:'Only the revealed synthetic candles are known. The next segment has not been shown.'};
+  return {id, asset, topic, title, subtitle:`Fresh ${asset} spot practice · ${paceLabel} checkpoints`, difficulty:'Adaptive practice', objective:'Read the visible information, choose a move and size, then learn from the reveal.', minutes:nodeCount === 8 ? 12 : 9, mode:'synthetic', version:generationVersion, source:{mode:'synthetic',provider:'IterAlpha authored simulation',venue:'No exchange',symbol:`${asset}-USD`,intervalSeconds:900,retrievedAt:'2026-10-11T00:00:00Z',version:dataVersion,license:'Deterministic teaching data. These are not historical prices, volumes, or live quotes.'}, candles:generateCandles(seed,base,topic,start,end+1),nodes,end,inference,uncertainty:'Only the revealed synthetic candles are known. The next segment has not been shown.'};
 }
 export function getScene(id: string): Scene | undefined { return scenes.find(s => s.id === id) ?? generatedScene(id); }
 export function summaries(): SceneSummary[] { return scenes.map(({id,title,subtitle,asset,topic,difficulty,objective,minutes,mode})=>({id,title,subtitle,asset,topic,difficulty,objective,minutes,mode})); }
