@@ -5,6 +5,7 @@ import "./visual-system.css";
 import "./experience.css";
 import VisitTracker from '../components/visit-tracker';
 import InteractionEffects from '../components/interaction-effects';
+import {LocaleProvider} from '../components/locale-provider';
 
 export const metadata: Metadata = {
   title: "IterAlpha — Train your judgment",
@@ -22,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}<VisitTracker/><InteractionEffects/></body>
+      <body className="antialiased"><LocaleProvider>{children}<VisitTracker/><InteractionEffects/></LocaleProvider></body>
     </html>
   );
 }

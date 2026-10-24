@@ -1,0 +1,1000 @@
+{
+  "method": "Synthetic combinatorial heuristic review; no human participants or measured usability outcomes.",
+  "personas": [
+    {
+      "id": 1,
+      "level": "first-time",
+      "task": "read-chart",
+      "locale": "en",
+      "device": "mobile",
+      "friction": [
+        "A first-time user needs a short chart lesson before interpreting indicators.",
+        "A dense chart and evidence bubbles need a narrow-screen visual check."
+      ]
+    },
+    {
+      "id": 2,
+      "level": "first-time",
+      "task": "read-chart",
+      "locale": "zh-CN",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "A first-time user needs a short chart lesson before interpreting indicators."
+      ]
+    },
+    {
+      "id": 3,
+      "level": "first-time",
+      "task": "read-chart",
+      "locale": "es",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "A first-time user needs a short chart lesson before interpreting indicators.",
+        "A dense chart and evidence bubbles need a narrow-screen visual check."
+      ]
+    },
+    {
+      "id": 4,
+      "level": "first-time",
+      "task": "read-chart",
+      "locale": "ja",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "A first-time user needs a short chart lesson before interpreting indicators."
+      ]
+    },
+    {
+      "id": 5,
+      "level": "first-time",
+      "task": "read-chart",
+      "locale": "ar",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "A first-time user needs a short chart lesson before interpreting indicators.",
+        "A dense chart and evidence bubbles need a narrow-screen visual check."
+      ]
+    },
+    {
+      "id": 6,
+      "level": "first-time",
+      "task": "size-a-trade",
+      "locale": "en",
+      "device": "desktop",
+      "friction": []
+    },
+    {
+      "id": 7,
+      "level": "first-time",
+      "task": "size-a-trade",
+      "locale": "zh-CN",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 8,
+      "level": "first-time",
+      "task": "size-a-trade",
+      "locale": "es",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 9,
+      "level": "first-time",
+      "task": "size-a-trade",
+      "locale": "ja",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 10,
+      "level": "first-time",
+      "task": "size-a-trade",
+      "locale": "ar",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 11,
+      "level": "first-time",
+      "task": "manage-risk",
+      "locale": "en",
+      "device": "mobile",
+      "friction": []
+    },
+    {
+      "id": 12,
+      "level": "first-time",
+      "task": "manage-risk",
+      "locale": "zh-CN",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 13,
+      "level": "first-time",
+      "task": "manage-risk",
+      "locale": "es",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 14,
+      "level": "first-time",
+      "task": "manage-risk",
+      "locale": "ja",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 15,
+      "level": "first-time",
+      "task": "manage-risk",
+      "locale": "ar",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 16,
+      "level": "first-time",
+      "task": "review-a-decision",
+      "locale": "en",
+      "device": "desktop",
+      "friction": []
+    },
+    {
+      "id": 17,
+      "level": "first-time",
+      "task": "review-a-decision",
+      "locale": "zh-CN",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 18,
+      "level": "first-time",
+      "task": "review-a-decision",
+      "locale": "es",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 19,
+      "level": "first-time",
+      "task": "review-a-decision",
+      "locale": "ja",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 20,
+      "level": "first-time",
+      "task": "review-a-decision",
+      "locale": "ar",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 21,
+      "level": "first-time",
+      "task": "compare-evidence",
+      "locale": "en",
+      "device": "mobile",
+      "friction": []
+    },
+    {
+      "id": 22,
+      "level": "first-time",
+      "task": "compare-evidence",
+      "locale": "zh-CN",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 23,
+      "level": "first-time",
+      "task": "compare-evidence",
+      "locale": "es",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 24,
+      "level": "first-time",
+      "task": "compare-evidence",
+      "locale": "ja",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 25,
+      "level": "first-time",
+      "task": "compare-evidence",
+      "locale": "ar",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 26,
+      "level": "beginner",
+      "task": "read-chart",
+      "locale": "en",
+      "device": "desktop",
+      "friction": []
+    },
+    {
+      "id": 27,
+      "level": "beginner",
+      "task": "read-chart",
+      "locale": "zh-CN",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "A dense chart and evidence bubbles need a narrow-screen visual check."
+      ]
+    },
+    {
+      "id": 28,
+      "level": "beginner",
+      "task": "read-chart",
+      "locale": "es",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 29,
+      "level": "beginner",
+      "task": "read-chart",
+      "locale": "ja",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "A dense chart and evidence bubbles need a narrow-screen visual check."
+      ]
+    },
+    {
+      "id": 30,
+      "level": "beginner",
+      "task": "read-chart",
+      "locale": "ar",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 31,
+      "level": "beginner",
+      "task": "size-a-trade",
+      "locale": "en",
+      "device": "mobile",
+      "friction": []
+    },
+    {
+      "id": 32,
+      "level": "beginner",
+      "task": "size-a-trade",
+      "locale": "zh-CN",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 33,
+      "level": "beginner",
+      "task": "size-a-trade",
+      "locale": "es",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 34,
+      "level": "beginner",
+      "task": "size-a-trade",
+      "locale": "ja",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 35,
+      "level": "beginner",
+      "task": "size-a-trade",
+      "locale": "ar",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 36,
+      "level": "beginner",
+      "task": "manage-risk",
+      "locale": "en",
+      "device": "desktop",
+      "friction": []
+    },
+    {
+      "id": 37,
+      "level": "beginner",
+      "task": "manage-risk",
+      "locale": "zh-CN",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 38,
+      "level": "beginner",
+      "task": "manage-risk",
+      "locale": "es",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 39,
+      "level": "beginner",
+      "task": "manage-risk",
+      "locale": "ja",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 40,
+      "level": "beginner",
+      "task": "manage-risk",
+      "locale": "ar",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 41,
+      "level": "beginner",
+      "task": "review-a-decision",
+      "locale": "en",
+      "device": "mobile",
+      "friction": []
+    },
+    {
+      "id": 42,
+      "level": "beginner",
+      "task": "review-a-decision",
+      "locale": "zh-CN",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 43,
+      "level": "beginner",
+      "task": "review-a-decision",
+      "locale": "es",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 44,
+      "level": "beginner",
+      "task": "review-a-decision",
+      "locale": "ja",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 45,
+      "level": "beginner",
+      "task": "review-a-decision",
+      "locale": "ar",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 46,
+      "level": "beginner",
+      "task": "compare-evidence",
+      "locale": "en",
+      "device": "desktop",
+      "friction": []
+    },
+    {
+      "id": 47,
+      "level": "beginner",
+      "task": "compare-evidence",
+      "locale": "zh-CN",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 48,
+      "level": "beginner",
+      "task": "compare-evidence",
+      "locale": "es",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 49,
+      "level": "beginner",
+      "task": "compare-evidence",
+      "locale": "ja",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 50,
+      "level": "beginner",
+      "task": "compare-evidence",
+      "locale": "ar",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 51,
+      "level": "intermediate",
+      "task": "read-chart",
+      "locale": "en",
+      "device": "mobile",
+      "friction": [
+        "A dense chart and evidence bubbles need a narrow-screen visual check."
+      ]
+    },
+    {
+      "id": 52,
+      "level": "intermediate",
+      "task": "read-chart",
+      "locale": "zh-CN",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 53,
+      "level": "intermediate",
+      "task": "read-chart",
+      "locale": "es",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "A dense chart and evidence bubbles need a narrow-screen visual check."
+      ]
+    },
+    {
+      "id": 54,
+      "level": "intermediate",
+      "task": "read-chart",
+      "locale": "ja",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 55,
+      "level": "intermediate",
+      "task": "read-chart",
+      "locale": "ar",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "A dense chart and evidence bubbles need a narrow-screen visual check."
+      ]
+    },
+    {
+      "id": 56,
+      "level": "intermediate",
+      "task": "size-a-trade",
+      "locale": "en",
+      "device": "desktop",
+      "friction": []
+    },
+    {
+      "id": 57,
+      "level": "intermediate",
+      "task": "size-a-trade",
+      "locale": "zh-CN",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 58,
+      "level": "intermediate",
+      "task": "size-a-trade",
+      "locale": "es",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 59,
+      "level": "intermediate",
+      "task": "size-a-trade",
+      "locale": "ja",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 60,
+      "level": "intermediate",
+      "task": "size-a-trade",
+      "locale": "ar",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 61,
+      "level": "intermediate",
+      "task": "manage-risk",
+      "locale": "en",
+      "device": "mobile",
+      "friction": []
+    },
+    {
+      "id": 62,
+      "level": "intermediate",
+      "task": "manage-risk",
+      "locale": "zh-CN",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 63,
+      "level": "intermediate",
+      "task": "manage-risk",
+      "locale": "es",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 64,
+      "level": "intermediate",
+      "task": "manage-risk",
+      "locale": "ja",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 65,
+      "level": "intermediate",
+      "task": "manage-risk",
+      "locale": "ar",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 66,
+      "level": "intermediate",
+      "task": "review-a-decision",
+      "locale": "en",
+      "device": "desktop",
+      "friction": []
+    },
+    {
+      "id": 67,
+      "level": "intermediate",
+      "task": "review-a-decision",
+      "locale": "zh-CN",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 68,
+      "level": "intermediate",
+      "task": "review-a-decision",
+      "locale": "es",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 69,
+      "level": "intermediate",
+      "task": "review-a-decision",
+      "locale": "ja",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 70,
+      "level": "intermediate",
+      "task": "review-a-decision",
+      "locale": "ar",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 71,
+      "level": "intermediate",
+      "task": "compare-evidence",
+      "locale": "en",
+      "device": "mobile",
+      "friction": []
+    },
+    {
+      "id": 72,
+      "level": "intermediate",
+      "task": "compare-evidence",
+      "locale": "zh-CN",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 73,
+      "level": "intermediate",
+      "task": "compare-evidence",
+      "locale": "es",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 74,
+      "level": "intermediate",
+      "task": "compare-evidence",
+      "locale": "ja",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 75,
+      "level": "intermediate",
+      "task": "compare-evidence",
+      "locale": "ar",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 76,
+      "level": "experienced",
+      "task": "read-chart",
+      "locale": "en",
+      "device": "desktop",
+      "friction": [
+        "Fixed MA periods limit personalized chart analysis."
+      ]
+    },
+    {
+      "id": 77,
+      "level": "experienced",
+      "task": "read-chart",
+      "locale": "zh-CN",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "Fixed MA periods limit personalized chart analysis.",
+        "A dense chart and evidence bubbles need a narrow-screen visual check."
+      ]
+    },
+    {
+      "id": 78,
+      "level": "experienced",
+      "task": "read-chart",
+      "locale": "es",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "Fixed MA periods limit personalized chart analysis."
+      ]
+    },
+    {
+      "id": 79,
+      "level": "experienced",
+      "task": "read-chart",
+      "locale": "ja",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "Fixed MA periods limit personalized chart analysis.",
+        "A dense chart and evidence bubbles need a narrow-screen visual check."
+      ]
+    },
+    {
+      "id": 80,
+      "level": "experienced",
+      "task": "read-chart",
+      "locale": "ar",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "Fixed MA periods limit personalized chart analysis."
+      ]
+    },
+    {
+      "id": 81,
+      "level": "experienced",
+      "task": "size-a-trade",
+      "locale": "en",
+      "device": "mobile",
+      "friction": []
+    },
+    {
+      "id": 82,
+      "level": "experienced",
+      "task": "size-a-trade",
+      "locale": "zh-CN",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 83,
+      "level": "experienced",
+      "task": "size-a-trade",
+      "locale": "es",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 84,
+      "level": "experienced",
+      "task": "size-a-trade",
+      "locale": "ja",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 85,
+      "level": "experienced",
+      "task": "size-a-trade",
+      "locale": "ar",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 86,
+      "level": "experienced",
+      "task": "manage-risk",
+      "locale": "en",
+      "device": "desktop",
+      "friction": []
+    },
+    {
+      "id": 87,
+      "level": "experienced",
+      "task": "manage-risk",
+      "locale": "zh-CN",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 88,
+      "level": "experienced",
+      "task": "manage-risk",
+      "locale": "es",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 89,
+      "level": "experienced",
+      "task": "manage-risk",
+      "locale": "ja",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 90,
+      "level": "experienced",
+      "task": "manage-risk",
+      "locale": "ar",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English."
+      ]
+    },
+    {
+      "id": 91,
+      "level": "experienced",
+      "task": "review-a-decision",
+      "locale": "en",
+      "device": "mobile",
+      "friction": [
+        "Rule feedback is less adaptive than a configured AI coach."
+      ]
+    },
+    {
+      "id": 92,
+      "level": "experienced",
+      "task": "review-a-decision",
+      "locale": "zh-CN",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "Rule feedback is less adaptive than a configured AI coach."
+      ]
+    },
+    {
+      "id": 93,
+      "level": "experienced",
+      "task": "review-a-decision",
+      "locale": "es",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "Rule feedback is less adaptive than a configured AI coach."
+      ]
+    },
+    {
+      "id": 94,
+      "level": "experienced",
+      "task": "review-a-decision",
+      "locale": "ja",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "Rule feedback is less adaptive than a configured AI coach."
+      ]
+    },
+    {
+      "id": 95,
+      "level": "experienced",
+      "task": "review-a-decision",
+      "locale": "ar",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "Rule feedback is less adaptive than a configured AI coach."
+      ]
+    },
+    {
+      "id": 96,
+      "level": "experienced",
+      "task": "compare-evidence",
+      "locale": "en",
+      "device": "desktop",
+      "friction": [
+        "Synthetic evidence cannot replace timestamped historical sources."
+      ]
+    },
+    {
+      "id": 97,
+      "level": "experienced",
+      "task": "compare-evidence",
+      "locale": "zh-CN",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "Synthetic evidence cannot replace timestamped historical sources."
+      ]
+    },
+    {
+      "id": 98,
+      "level": "experienced",
+      "task": "compare-evidence",
+      "locale": "es",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "Synthetic evidence cannot replace timestamped historical sources."
+      ]
+    },
+    {
+      "id": 99,
+      "level": "experienced",
+      "task": "compare-evidence",
+      "locale": "ja",
+      "device": "mobile",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "Synthetic evidence cannot replace timestamped historical sources."
+      ]
+    },
+    {
+      "id": 100,
+      "level": "experienced",
+      "task": "compare-evidence",
+      "locale": "ar",
+      "device": "desktop",
+      "friction": [
+        "Scene evidence and coach prose remain in English.",
+        "Synthetic evidence cannot replace timestamped historical sources."
+      ]
+    }
+  ]
+}
