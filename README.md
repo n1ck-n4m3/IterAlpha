@@ -2,14 +2,15 @@
 
 IterAlpha is an open-source, browser-based trading judgment trainer. It helps people learn, make a decision before the future is visible, review their reasoning, and practise again. The current MVP starts with crypto spot simulation. It does not place real trades or promise investment performance.
 
-The homepage at `/` introduces two paths and includes an interactive decision preview and an opt-in early-access form. The training room at `/app` contains fresh generated BTC/ETH scenarios, a synthetic market lab, a decision journal, and progress history. The Foundations path adds explanations; Advanced Practice shows facts and uncertainty first. Reasons are optional taps, not writing assignments.
+The homepage at `/` introduces two paths and includes an interactive decision preview and an opt-in early-access form. A visible Home link returns there from the training room at `/app`. The training room contains fresh generated BTC/ETH scenarios, a synthetic market lab, a decision journal, and progress history. The Foundations path adds a short beginner tutorial; Advanced Practice shows facts and uncertainty first. Reasons are optional taps, not writing assignments.
 
 ## What works today
 
 - A fresh synthetic scenario for each round, with six guided or eight advanced hidden-future decision checkpoints. Reveal intervals are 15 minutes, 1 hour, or 4 hours; users may wait at any checkpoint. The virtual starting balance defaults to $10,000.
 - Spot buy, wait, hold, and sell decisions. The order preview shows USD spend, quantity, remaining cash, and estimated loss at a protective stop. Fees, slippage, fills, stops, and outcomes are calculated by the simulation engine.
-- A decision-by-decision review, rule-based process feedback, a journal, and JSON export. AI coaching is optional and not enabled without server credentials.
-- A synthetic market lab with charts for BTC, ETH, SOL, and XRP. Its sample values are not live or historical quotes and are separate from simulated trade execution.
+- A prominent coach card after every decision with actual order amounts, position exposure, estimated stop risk, process feedback, and three interactive follow-up questions. Without server credentials, its prose and answers are explicitly labeled as a rule-based AI coach preview. An optional AI endpoint can replace the step feedback when configured.
+- A decision-by-decision final review, journal, and JSON export.
+- A synthetic market lab with charts for BTC, ETH, SOL, and XRP, plus a labeled preview of the future live paper-trading workflow. Its sample values are not live or historical quotes and are separate from simulated trade execution.
 - An opt-in email form stored in D1. No automated email campaign is connected.
 - Optional ChatGPT account sign-in. Guests can play without an account; signing in claims this browser's guest rounds and lets the same account reopen its journal on another device.
 - A private `/admin` visitor dashboard with page views, unique visitors, signed-in visitors, and early-access totals. The account owner is configured with `ITERALPHA_ADMIN_EMAIL` or `ITERALPHA_ADMIN_USER_ID`; the route and report API check this on the server.

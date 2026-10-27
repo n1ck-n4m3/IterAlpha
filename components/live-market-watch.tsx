@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { Radio, RefreshCw, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Radio, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react';
 import type { Candle } from '../lib/training/types';
 import { aggregateCandles } from '../lib/training/engine';
 import { COPY } from '../lib/ui-copy';
@@ -68,5 +68,6 @@ export default function MarketLab() {
       <p className="live-chart-note">{COPY.market.chartNote}</p>{error && <p className="live-error" role="status">{error}</p>}
     </section>
     <div className="live-notice"><ShieldCheck size={18}/><p>{COPY.market.notice}</p></div>
+    <section className="paper-preview"><div><span className="eyebrow"><Sparkles size={14}/>{COPY.market.paperPreview.eyebrow}</span><h2>{COPY.market.paperPreview.title}</h2><p>{COPY.market.paperPreview.description}</p><div className="paper-preview-steps">{COPY.market.paperPreview.steps.map((step,index)=><span key={step}><b>0{index+1}</b>{step}</span>)}</div><a href="/app?track=foundations">{COPY.market.paperPreview.action}<ArrowRight size={15}/></a></div><span className="paper-preview-status">{COPY.market.paperPreview.status}</span></section>
   </div>;
 }

@@ -8,6 +8,7 @@ export const COPY = {
     feedError:'The sample could not be loaded. Please try again.',
     chartNote:'Each candle represents 15 simulated minutes. Chart styles change the view, not the underlying sample.',
     notice:'All prices, volumes, and charts here are generated examples. They are not live quotes or historical market data. Training rounds use separate synthetic paths and cannot place real orders.',
+    paperPreview:{eyebrow:'NEXT PRACTICE MODE',title:'Paper-trade the live market, with a coach beside you.',status:'Licensed feed not connected',description:'The same virtual cash, sizing controls, and decision analysis will work against timestamped real quotes once a display-and-training data license is connected. Orders will remain simulated.',steps:['Check the quote age and spread before submitting.','Simulate the fill, fees, position, and stop risk.','Update the analysis as new licensed quotes arrive.'],action:'Train the decision loop now'},
   },
   actions: {buy:'Buy',wait:'Wait',hold:'Hold',halve:'Sell half',sell:'Sell'},
   flow: {

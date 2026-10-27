@@ -1,0 +1,59 @@
+.app-home-link{display:inline-flex;align-items:center;gap:6px;min-height:42px;color:#bab0cc;font-size:12px;font-weight:600;text-decoration:none;transition:color .2s ease,transform .2s ease}
+.app-home-link:hover{color:#f5eaff;transform:translateY(-2px)}
+.decision-column{min-width:0}
+.beginner-guide,.decision-coach-card{position:relative;overflow:hidden;border:1px solid #8663b783;border-radius:16px;background:radial-gradient(circle at 95% 0,#672faa45,transparent 47%),linear-gradient(145deg,#241935,#14121f 70%);box-shadow:0 20px 55px #07040e8a,inset 0 1px #fff2}
+.beginner-guide{margin-bottom:14px}
+.beginner-guide:before,.decision-coach-card:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,#60dfff,#aa72ff,#ef70db);opacity:.85}
+.beginner-guide-toggle{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:16px;background:transparent;color:#f2e8ff}
+.beginner-guide-icon,.decision-coach-emblem{width:38px;height:38px;display:grid;place-items:center;border:1px solid #bb84ef75;border-radius:12px;background:#a36ada2b;color:#d8adff;flex:none}
+.beginner-guide-toggle>span:nth-child(2){min-width:0;flex:1}
+.beginner-guide-toggle small,.decision-coach-top small{display:block;color:#b995e5;font-size:9px;font-weight:700;letter-spacing:1.3px}
+.beginner-guide-toggle strong{display:block;margin-top:5px;font-size:15px;letter-spacing:-.25px}
+.beginner-guide-toggle-label{display:flex;align-items:center;gap:4px;color:#ab9abc;font-size:9px;white-space:nowrap}
+.beginner-guide-toggle-label svg{transition:transform .25s ease}.beginner-guide.open .beginner-guide-toggle-label svg{transform:rotate(180deg)}
+.beginner-guide-body{padding:1px 17px 17px;animation:learn-appear .32s ease both}
+.beginner-guide-step{display:flex;align-items:flex-start;gap:12px;border-top:1px solid #8160a22d;padding:12px 0}
+.beginner-guide-step>span{font-size:12px;color:#a883d5;font-variant-numeric:tabular-nums;font-weight:700}
+.beginner-guide-step strong{display:block;color:#eee2fb;font-size:11px}
+.beginner-guide-step p{margin-top:4px;color:#baaacb;font-size:10px;line-height:1.55}
+.beginner-guide-note{display:flex;gap:7px;align-items:flex-start;padding:10px 11px;border:1px solid #6a55835a;border-radius:8px;background:#20192ba8;color:#a99abd;font-size:9px;line-height:1.5}
+.beginner-guide-note svg{color:#c391f6;flex:none;margin-top:1px}
+.decision-coach-card{padding:19px;margin-bottom:14px;scroll-margin-top:86px;animation:learn-appear .45s ease both}
+.decision-coach-top{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.decision-coach-top>div{flex:1;min-width:130px}
+.decision-coach-top h2{font-size:19px;letter-spacing:-.55px;color:#f7ebff;margin-top:4px}
+.decision-coach-mode{font-size:8px;font-weight:700;letter-spacing:.3px;line-height:1.4;color:#e1c8ff;background:#8f52cf2d;border:1px solid #b780e879;border-radius:100px;padding:7px 9px}
+.decision-coach-disclosure{color:#b9abc9;font-size:9px;line-height:1.55;margin:13px 0 15px}
+.decision-coach-metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.decision-coach-metrics>div{min-width:0;padding:10px;border:1px solid #6b537d72;border-radius:8px;background:#150f208c}
+.decision-coach-metrics span{display:block;font-size:9px;color:#9e89b6}
+.decision-coach-metrics strong{display:block;overflow-wrap:anywhere;margin-top:5px;font-size:13px;color:#f2e5ff;font-variant-numeric:tabular-nums}
+.decision-coach-analysis{display:grid;gap:8px;margin-top:13px}
+.decision-coach-analysis>div{border-left:2px solid #ae7cf0;padding:2px 0 3px 10px}
+.decision-coach-analysis>div:nth-child(2){border-color:#67d6e9}
+.decision-coach-analysis span,.decision-coach-followups>strong{display:flex;align-items:center;gap:7px;color:#d9c7ee;font-size:10px;font-weight:700}
+.decision-coach-analysis p{margin-top:5px;color:#c1b5ce;font-size:10px;line-height:1.55}
+.decision-coach-risk{display:flex;align-items:flex-start;gap:6px;color:#c9aeb9;font-size:9px;line-height:1.45;margin:12px 0}
+.decision-coach-risk svg{flex:none;margin-top:1px}
+.decision-coach-outcome{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid #805e9a4b;border-bottom:1px solid #805e9a4b}
+.decision-coach-outcome>span{color:#a998bb;font-size:10px;flex:1}
+.decision-coach-outcome strong{font-size:14px;font-variant-numeric:tabular-nums}
+.decision-coach-outcome small{display:none}
+.decision-coach-followups{margin-top:14px}
+.decision-coach-followups>div{display:grid;gap:5px;margin-top:9px}
+.decision-coach-followups button{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;border:1px solid #5b466f;border-radius:7px;padding:9px 10px;text-align:left;color:#d3c0e9;background:#1d1729;font-size:10px;transition:transform .18s ease,background .18s ease,border-color .18s ease}
+.decision-coach-followups button:hover,.decision-coach-followups button.active{transform:translateX(3px);border-color:#ba86f2;background:#332044}
+.decision-coach-followups button svg{flex:none}
+.decision-coach-answer{padding:10px;margin-top:8px;border-radius:8px;background:#3a2753a8;border:1px solid #a373d064;color:#e0d1f1;font-size:10px;line-height:1.55;animation:learn-appear .25s ease both}
+.decision-coach-answer span{display:block;color:#bfa0e0;font-size:9px;font-weight:700;margin-bottom:4px}
+@keyframes learn-appear{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:690px){.app-home-link{font-size:10px;min-height:34px}.app-home-link span{display:none}.decision-coach-card{margin-bottom:10px}.decision-coach-top h2{font-size:18px}.decision-coach-mode{margin-left:49px}.beginner-guide-toggle-label{font-size:0}.beginner-guide-toggle-label svg{width:15px}.decision-coach-metrics strong{font-size:12px}}
+@media(max-width:390px){.app-home-link{font-size:9px}.top-nav{gap:7px!important}.top-nav button{font-size:9px!important}}
+@media(prefers-reduced-motion:reduce){.decision-coach-card,.beginner-guide-body,.decision-coach-answer{animation:none}}
+.paper-preview{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;position:relative;overflow:hidden;padding:28px;margin:24px 0;border:1px solid #9676be82;border-radius:17px;background:radial-gradient(circle at 100% 0,#8042bc55,transparent 45%),linear-gradient(135deg,#20172e,#101721);box-shadow:0 16px 50px #06040e73}
+.paper-preview:before{content:"";position:absolute;right:-100px;bottom:-180px;width:360px;height:360px;border-radius:50%;border:1px solid #c28ff43d;box-shadow:0 0 0 35px #a75ded10,0 0 0 85px #a75ded0b;pointer-events:none}
+.paper-preview>div{position:relative;z-index:1;max-width:740px}.paper-preview .eyebrow{display:flex;align-items:center;gap:7px;color:#c79cff}.paper-preview h2{font-size:clamp(23px,2.6vw,34px);line-height:1.1;letter-spacing:-.7px;margin:13px 0;color:#f6eaff}.paper-preview p{font-size:12px;line-height:1.6;color:#b6a8c5}
+.paper-preview-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:19px 0}.paper-preview-steps span{border:1px solid #765d906e;border-radius:8px;padding:11px;background:#100e1c8c;color:#d1c4dc;font-size:10px;line-height:1.5}.paper-preview-steps b{display:block;color:#c59af5;margin-bottom:5px}
+.paper-preview a{display:inline-flex;align-items:center;gap:8px;background:#b99aff;color:#171021;padding:10px 13px;border-radius:7px;font-size:11px;font-weight:700;transition:transform .2s ease,box-shadow .2s ease}.paper-preview a:hover{transform:translateY(-2px);box-shadow:0 8px 26px #ab79ff7a}
+.paper-preview-status{position:relative;z-index:1;flex:none;color:#d1b9e7;background:#48325570;border:1px solid #a479be8c;border-radius:100px;padding:8px 11px;font-size:9px;font-weight:700}
+@media(max-width:690px){.paper-preview{display:block;padding:21px}.paper-preview-status{display:inline-block;margin-top:18px}.paper-preview-steps{grid-template-columns:1fr}}

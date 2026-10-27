@@ -5,7 +5,7 @@ export const localeNames:Record<Locale,string> = {
 };
 const english = {
   language:'Language',train:'Play',marketLab:'Market lab',review:'Review',progress:'Progress',earlyAccess:'Early access',
-  startTraining:'Start training',heroTitle:'The edge is how you think.',heroDescription:'Learn the market. Decide before the answer is visible. Review your reasoning. Repeat.',explorePaths:'Explore the two paths',
+  startTraining:'Start training',heroTitle:'The edge is how you think.',heroDescription:'Learn the market. Decide before the answer is visible. See your fill, risk, and coach analysis. Adapt and repeat.',explorePaths:'Explore the two paths',
   foundations:'Foundations',advanced:'Advanced practice',choosePath:'Choose your practice path',startingCash:'Starting virtual cash',cryptoAsset:'Crypto asset',revealPace:'Reveal pace',startRound:'Start round',
   simulatedMarket:'Simulated market',chartStyle:'Chart style',indicators:'Indicators',volume:'Volume',ma7:'MA 7',ma25:'MA 25',macd:'MACD',rsi:'RSI',
   indicatorWarning:'Indicators summarize past bars; they do not predict the next move.',macdWarmup:'MACD needs 34 visible bars.',rsiWarmup:'RSI needs 15 visible bars.',volumeUnavailable:'Volume is unavailable in this sample.',

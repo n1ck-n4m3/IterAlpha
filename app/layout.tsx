@@ -3,6 +3,7 @@ import "./globals.css";
 import "./landing.css";
 import "./visual-system.css";
 import "./experience.css";
+import "./learning.css";
 import VisitTracker from '../components/visit-tracker';
 import InteractionEffects from '../components/interaction-effects';
 import {LocaleProvider} from '../components/locale-provider';
