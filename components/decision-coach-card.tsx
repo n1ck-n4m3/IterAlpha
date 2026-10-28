@@ -4,6 +4,7 @@ import { ArrowRight, BrainCircuit, CircleHelp, ShieldAlert, Sparkles } from 'luc
 import type { CoachReply, SessionView } from '../lib/training/types';
 import { COPY } from '../lib/ui-copy';
 import { LEARNING_COPY as C } from '../lib/learning-copy';
+import {DECISION_COPY} from '../lib/decision-copy';
 import { decisionCoachMetrics } from '../lib/training/coach-metrics';
 
 const money = (value: number) => new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD', maximumFractionDigits: 2}).format(value);
@@ -30,6 +31,7 @@ export default function DecisionCoachCard({session, reply}: {session: SessionVie
       {action==='buy'&&metrics.entryRisk>0&&<div><span>{C.coach.entryRisk}</span><strong>{money(metrics.entryRisk)}</strong></div>}
     </div>
     <div className="decision-coach-analysis"><div><span><Sparkles size={14}/>{C.coach.process}</span><p>{reply?.process_observation ?? C.coach.analyzing}</p></div><div><span><ArrowRight size={14}/>{C.coach.next}</span><p>{reply?.takeaway ?? decision.note}</p></div></div>
+    {reply?.decisionAssessment?.status==='ready'&&<details className="coach-details"><summary>{DECISION_COPY.title}</summary><p>{DECISION_COPY.supportLabel}: {DECISION_COPY.support[reply.decisionAssessment.support]}</p><p>{DECISION_COPY.focusLabel}: {DECISION_COPY.focus[reply.decisionAssessment.focus]}</p><p>{DECISION_COPY.note}</p><small>{reply.decisionAssessment.model} · {reply.decisionAssessment.quantization} · {reply.decisionAssessment.latencyMs} ms</small></details>}
     <p className="decision-coach-risk"><ShieldAlert size={14}/>{C.coach.riskCaveat}</p>
     {observedMove !== null && <div className="decision-coach-outcome"><span>{C.coach.outcome}</span><strong className={observedMove >= 0 ? 'positive' : 'negative'}>{observedMove >= 0 ? '+' : ''}{observedMove.toFixed(2)}%</strong><small>{C.coach.outcomeNote}</small></div>}
     <div className="decision-coach-followups"><strong><CircleHelp size={15}/>{C.coach.questions}</strong><div>{questions.map((item, index) => <button type="button" key={item.question} className={selectedQuestion === index ? 'active' : ''} onClick={() => setSelectedQuestion(selectedQuestion === index ? null : index)}>{item.question}<ArrowRight size={13}/></button>)}</div>{selectedQuestion !== null && <p className="decision-coach-answer"><span>{C.coach.answer}</span>{questions[selectedQuestion].answer}</p>}</div>

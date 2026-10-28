@@ -1,0 +1,5 @@
+# Install the pinned SemIf readout, including its pinned model runtime.
+semif-phase1 @ git+https://github.com/TheoLeeCJ/SemIf-OpenJev.git@23cf1f39fc9534fe81437200959b6dfc7106e45a
+fastapi>=0.115,<1
+uvicorn>=0.34,<1
+bitsandbytes>=0.48,<1

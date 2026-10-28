@@ -52,7 +52,15 @@ export interface SessionView {
 export interface CoachReply {
   mode: 'ai' | 'rules'; status: string; takeaway: string; process_observation: string;
   next_drill_reason: string; evidence_ids: string[]; question?: string; createdAt: string; promptVersion: string;
+  decisionAssessment?: DecisionAssessment;
 }
+export type DecisionFocus = 'sizing' | 'stops' | 'costs' | 'evidence' | 'patience' | 'insufficient';
+export type DecisionAssessment = {status:'unavailable'} | {
+  status:'ready'; model:string; revision:string; quantization:string;
+  support:'supported'|'mixed'|'insufficient'|'uncertain'; focus:DecisionFocus;
+  uncertain:boolean; scores:Record<string,Record<string,number>>; promptHashes:string[];
+  latencyMs:number; calibration:'uncalibrated';
+};
 export interface HistoryItem { id: string; sceneId: string; title: string; asset: string; topic: Topic; status: Session['status']; decisions: number; netPnl: number; mode: MarketSource['mode']; updatedAt: string; }
 export interface ProgressView {
   completed: number; uniqueScenes: number; decisions: number; returns: number; fees: number;

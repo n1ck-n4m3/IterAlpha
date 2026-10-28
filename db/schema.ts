@@ -27,3 +27,9 @@ export const siteVisits = sqliteTable('site_visits', {
   uniqueIndex('site_visits_visitor_page_bucket').on(table.visitorHash, table.page, table.bucket),
   index('site_visits_occurred_at').on(table.occurredAt),
 ]);
+
+export const spiders = sqliteTable('spiders', {
+  id: text('id').primaryKey(), owner: text('owner').notNull(), version: integer('version').notNull(),
+  status: text('status').notNull(), payload: text('payload').notNull(),
+  createdAt: integer('created_at').notNull(), updatedAt: integer('updated_at').notNull(),
+}, table => [index('spiders_owner_updated').on(table.owner, table.updatedAt), index('spiders_status').on(table.status)]);

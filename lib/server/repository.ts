@@ -33,6 +33,17 @@ export class Repository {
         .bind(signedOwner,JSON.stringify(session),row.id,guestOwner).run();
     }
   }
+  async claimGuestSpiders(guestOwner: string, signedOwner: string) {
+    const rows = await this.db.prepare('SELECT id, payload FROM spiders WHERE owner = ?').bind(guestOwner).all<{id:string;payload:string}>();
+    const active = await this.db.prepare("SELECT id FROM spiders WHERE owner = ? AND status = 'running' LIMIT 1").bind(signedOwner).first<{id:string}>();
+    for (const row of rows.results) {
+      const bot = JSON.parse(row.payload) as import('../spider/types.ts').Bot; bot.owner = signedOwner;
+      if (active && bot.status === 'running') {bot.status = 'paused'; bot.events.push({time:Date.now(),reason:'paused',action:'pause'});}
+      bot.version++;
+      await this.db.prepare('UPDATE spiders SET owner = ?, status = ?, version = ?, payload = ? WHERE id = ? AND owner = ?')
+        .bind(signedOwner,bot.status,bot.version,JSON.stringify(bot),row.id,guestOwner).run();
+    }
+  }
   async signUp(email: string, track: 'foundations' | 'advanced' | 'undecided', source: string, now: string) {
     await this.db.prepare(`INSERT INTO early_access_signups (email,track,source,consent_at,created_at,updated_at)
       VALUES (?,?,?,?,?,?) ON CONFLICT(email) DO UPDATE SET track = excluded.track, source = excluded.source,

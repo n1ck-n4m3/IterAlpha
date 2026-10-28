@@ -5,15 +5,17 @@ import { generatedSceneId, getScene, summaries, view } from './scenes.ts';
 import { history, progress } from './progress.ts';
 import { coachFeedback, ruleFeedback, ruleStepFeedback, stepCoachFeedback } from './coach.ts';
 import { marketAssets, syntheticMarketSnapshot } from './synthetic-market.ts';
+import {decisionProviderConfigured, openDecisionFeedback, type DecisionEnvironment} from './decision-provider.ts';
+import {handleRunner, handleSpider, type SpiderEnvironment} from './spider-api.ts';
 import {isSiteAdmin} from './admin-auth.ts';
 
-interface ApiEnvironment { DB?: D1Database; OPENAI_API_KEY?: string; OPENAI_MODEL?: string; ITERALPHA_ADMIN_USER_ID?: string; ITERALPHA_ADMIN_EMAIL?: string }
+interface ApiEnvironment extends SpiderEnvironment, DecisionEnvironment { DB?: D1Database; OPENAI_API_KEY?: string; OPENAI_MODEL?: string; ITERALPHA_ADMIN_USER_ID?: string; ITERALPHA_ADMIN_EMAIL?: string }
 const decisionSchema = z.object({action:z.enum(['buy','wait','hold','halve','sell']),riskPercent:z.number().finite().optional(),amountUsd:z.number().finite().optional(),sellPercent:z.number().finite().min(1).max(100).optional(),stopPrice:z.number().finite().optional(),reason:z.enum(['Price structure','Defined risk','Need confirmation','Event uncertainty']).optional(),thesis:z.string().trim().max(300).optional(),version:z.number().int().min(0).max(8),requestId:z.string().uuid()}).strict();
 const startSchema = z.object({sceneId:z.string().max(80).optional(),asset:z.enum(['BTC','ETH','random']).optional(),paceHours:z.union([z.literal(0.25),z.literal(1),z.literal(4)]).optional(),initialCash:z.number().int().min(100).max(1_000_000).optional(),track:z.enum(['foundations','advanced']).optional(),requestId:z.string().uuid()}).strict();
 const coachSchema = z.object({requestId:z.string().uuid(),question:z.string().trim().max(300).default('')}).strict();
 const stepCoachSchema=z.object({requestId:z.string().uuid()}).strict();
 const signupSchema = z.object({email:z.string().trim().email().max(254),track:z.enum(['foundations','advanced','undecided']),source:z.enum(['home','foundations','advanced']),consent:z.literal(true),website:z.string().max(100).optional()}).strict();
-const visitSchema = z.object({page:z.enum(['home','training','market','review','progress'])}).strict();
+const visitSchema = z.object({page:z.enum(['home','training','market','review','progress','spider'])}).strict();
 async function visitorHash(owner:string){const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(owner));return Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');}
 function identity(request: Request) {
   const signedIn = request.headers.get('oai-authenticated-user-id');
@@ -23,16 +25,17 @@ function identity(request: Request) {
   const fresh = Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('');
   return {owner:`guest:${fresh}`,cookie:`iteralpha_guest=${fresh}; HttpOnly; SameSite=Lax; Path=/; Max-Age=31536000${new URL(request.url).protocol==='https:'?'; Secure':''}`};
 }
-async function readBody(request: Request) {
+async function readBody(request: Request, limit = 4096) {
   if (!request.headers.get('content-type')?.startsWith('application/json')) throw new TrainingError('JSON is required.',415);
-  if (Number(request.headers.get('content-length')??0)>4096) throw new TrainingError('Request is too large.',413);
+  if (Number(request.headers.get('content-length')??0)>limit) throw new TrainingError('Request is too large.',413);
   const reader=request.body?.getReader(); if(!reader)throw new TrainingError('Request body is missing.');
   const chunks:Uint8Array[]=[];let size=0;
-  while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>4096){await reader.cancel();throw new TrainingError('Request is too large.',413);}chunks.push(value);}
+  while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>limit){await reader.cancel();throw new TrainingError('Request is too large.',413);}chunks.push(value);}
   const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
   try { return JSON.parse(new TextDecoder().decode(bytes)); } catch { throw new TrainingError('Invalid JSON.'); }
 }
 export async function handleApi(request: Request, env: ApiEnvironment): Promise<Response> {
+  if (new URL(request.url).pathname === '/api/spider/run') return handleRunner(request, env);
   const user=identity(request);
   const headers:Record<string,string>={'Content-Type':'application/json','Cache-Control':'no-store, private','X-Content-Type-Options':'nosniff','Vary':'Cookie, oai-authenticated-user-id'};
   if(user.cookie)headers['Set-Cookie']=user.cookie;
@@ -43,6 +46,7 @@ export async function handleApi(request: Request, env: ApiEnvironment): Promise<
       const origin=request.headers.get('origin');
       if(request.headers.get('x-iteralpha-request')!=='1'||request.headers.get('sec-fetch-site')==='cross-site'||(origin&&origin!==url.origin)) throw new TrainingError('This request must come from the training application.',403);
     }
+    if(path.startsWith('/api/spider')) return json(await handleSpider(path, request, env, user.owner, readBody));
     if(path==='/api/health')return json({ok:true,storageConfigured:!!env.DB,aiConfigured:!!env.OPENAI_API_KEY&&!!env.OPENAI_MODEL,dataMode:summaries().some(scene=>scene.mode==='historical')?'mixed':'synthetic',version:'0.2.0'});
     if(path==='/api/market'&&request.method==='GET'){
       const selected=url.searchParams.get('symbol')??'BTC';
@@ -70,10 +74,10 @@ export async function handleApi(request: Request, env: ApiEnvironment): Promise<
     if(path==='/api/bootstrap'&&request.method==='GET'){
       if(user.owner.startsWith('chatgpt:')){
         const guestToken=request.headers.get('cookie')?.match(/(?:^|;\s*)iteralpha_guest=([a-f0-9]{64})(?:;|$)/)?.[1];
-        if(guestToken)await repo.claimGuestSessions(`guest:${guestToken}`,user.owner);
+        if(guestToken){await repo.claimGuestSessions(`guest:${guestToken}`,user.owner);await repo.claimGuestSpiders(`guest:${guestToken}`,user.owner);}
       }
       const sessions=await repo.list(user.owner);const active=sessions.find(s=>s.status==='active');
-      return json({scenes:summaries(),active:active?view(active):null,history:history(sessions),progress:progress(sessions),rules:RULES,aiConfigured:!!env.OPENAI_API_KEY&&!!env.OPENAI_MODEL,identity:user.owner.startsWith('chatgpt:')?'signed-in':'guest'});
+      return json({scenes:summaries(),active:active?view(active):null,history:history(sessions),progress:progress(sessions),rules:RULES,aiConfigured:!!env.OPENAI_API_KEY&&!!env.OPENAI_MODEL,decisionConfigured:decisionProviderConfigured(env),identity:user.owner.startsWith('chatgpt:')?'signed-in':'guest'});
     }
     if(path==='/api/sessions'&&request.method==='POST'){
       const input=startSchema.parse(await readBody(request));const sceneId=input.sceneId??generatedSceneId(input.requestId,input.asset,input.paceHours,input.track);const scene=getScene(sceneId);if(!scene)throw new TrainingError('Scene not found.',404);
@@ -105,7 +109,12 @@ export async function handleApi(request: Request, env: ApiEnvironment): Promise<
       if(cached?.response)return json(JSON.parse(cached.response));
       if(request.method==='GET')return json(ruleStepFeedback(session));
       stepCoachSchema.parse(await readBody(request));
-      if(!env.OPENAI_API_KEY||!env.OPENAI_MODEL)return json(ruleStepFeedback(session));
+      if(!env.OPENAI_API_KEY||!env.OPENAI_MODEL){
+        if(!decisionProviderConfigured(env))return json(ruleStepFeedback(session));
+        if(cached)return json(ruleStepFeedback(session));
+        if(!await repo.reserveStepCoach(user.owner,session.id,key,new Date().toISOString()))return json(ruleStepFeedback(session));
+        const reply=await openDecisionFeedback(session,scene,env);await repo.finishCoach(user.owner,key,reply);return json(reply);
+      }
       if(cached){
         if(Date.now()-Date.parse(cached.created_at)<20000) return json(ruleStepFeedback(session,'AI coach is preparing feedback. Showing a rule-based cue for now.'));
         const fallback=ruleStepFeedback(session,'The earlier AI request was interrupted. Showing rule-based feedback.');
