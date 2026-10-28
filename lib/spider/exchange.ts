@@ -6,7 +6,7 @@ export function parseBinanceMarkets(raw: unknown): Market[] {
   const markets: Market[] = [];
   for (const item of rows) {
     const row = item as Record<string, unknown>;
-    if (row.status !== 'TRADING' || row.isSpotTradingAllowed !== true || !/^[A-Z0-9_]{2,40}$/.test(String(row.symbol))) continue;
+    if (row.status !== 'TRADING' || row.isSpotTradingAllowed !== true || !/^[\p{L}\p{N}_]{2,40}$/u.test(String(row.symbol))) continue;
     try {
       const filters = row.filters as Record<string, unknown>[];
       const lot = filters.find(f => f.filterType === 'LOT_SIZE');
@@ -14,7 +14,7 @@ export function parseBinanceMarkets(raw: unknown): Market[] {
       const notional = filters.find(f => f.filterType === 'NOTIONAL' || f.filterType === 'MIN_NOTIONAL');
       if (!lot) continue;
       const base = String(row.baseAsset), quote = String(row.quoteAsset);
-      if (!/^[A-Z0-9_]{1,30}$/.test(base) || !/^[A-Z0-9_]{1,30}$/.test(quote)) continue;
+      if (!/^[\p{L}\p{N}_]{1,30}$/u.test(base) || !/^[\p{L}\p{N}_]{1,30}$/u.test(quote)) continue;
       const step = Number(marketLot?.stepSize) > 0 ? positive(marketLot!.stepSize) : positive(lot.stepSize);
       markets.push({id: `binance:${row.symbol}`, venue: 'binance', symbol: String(row.symbol), base, quote,
         quantityStep: Math.max(step, positive(lot.stepSize)), minQuantity: Math.max(Number(marketLot?.minQty) || 0, positive(lot.minQty)),

@@ -3,7 +3,7 @@ import {z} from 'zod';
 import type {Interval, Snapshot} from '../spider/types.ts';
 const positive = z.number().finite().positive().max(1e30);
 const level = z.object({price: positive, quantity: positive}).strict();
-const market = z.object({id: z.string().regex(/^binance:[A-Z0-9_]{2,40}$/), venue: z.literal('binance'), symbol: z.string().regex(/^[A-Z0-9_]{2,40}$/), base: z.string().regex(/^[A-Z0-9_]{1,30}$/), quote: z.string().regex(/^[A-Z0-9_]{1,30}$/), quantityStep: positive, minQuantity: positive, maxQuantity: positive, minNotional: z.number().finite().min(0).max(1e30)}).strict();
+const market = z.object({id: z.string().regex(/^binance:[\p{L}\p{N}_]{2,40}$/u), venue: z.literal('binance'), symbol: z.string().regex(/^[\p{L}\p{N}_]{2,40}$/u), base: z.string().regex(/^[\p{L}\p{N}_]{1,30}$/u), quote: z.string().regex(/^[\p{L}\p{N}_]{1,30}$/u), quantityStep: positive, minQuantity: positive, maxQuantity: positive, minNotional: z.number().finite().min(0).max(1e30)}).strict();
 export const browserSnapshotSchema = z.object({market, interval: z.union([z.literal(60), z.literal(300), z.literal(900)]),
   candles: z.array(z.object({time: z.number().int().positive(), open: positive, high: positive, low: positive, close: positive, volume: z.number().finite().min(0).max(1e30)}).strict()).min(2).max(200),
   bids: z.array(level).min(1).max(100), asks: z.array(level).min(1).max(100), price: positive, bid: positive, ask: positive,

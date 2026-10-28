@@ -19,7 +19,7 @@ async function request(url: string): Promise<{data: unknown; time: number}> {
 export function parseCoinbaseMarkets(raw: unknown): Market[] {
   if (!Array.isArray(raw)) throw new Error('Invalid exchange directory.');
   return raw.flatMap(row => {
-    if (row.status !== 'online' || row.trading_disabled || row.cancel_only || row.post_only || row.limit_only || !/^[A-Z0-9-]{3,60}$/.test(row.id)) return [];
+    if (row.status !== 'online' || row.trading_disabled || row.cancel_only || row.post_only || row.limit_only || !/^[\p{L}\p{N}-]{3,60}$/u.test(row.id)) return [];
     try {return [{id: `coinbase:${row.id}`, venue: 'coinbase' as const, symbol: row.id, base: row.base_currency, quote: row.quote_currency,
       quantityStep: positive(row.base_increment), minQuantity: Number(row.base_min_size) || positive(row.base_increment), maxQuantity: Number(row.base_max_size) || Number.MAX_VALUE, minNotional: positive(row.min_market_funds ?? 1)}];}
     catch {return [];}

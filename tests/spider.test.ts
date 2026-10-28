@@ -6,6 +6,7 @@ import {advanceBot, createBot, EXECUTION, stats} from '../lib/spider/engine.ts';
 import {evaluateStrategy} from '../lib/spider/strategy.ts';
 import {parseBinanceMarkets, parseBinanceCandles, parseCoinbaseMarkets} from '../lib/server/spider-market.ts';
 import {SpiderRepository} from '../lib/server/spider-repository.ts';
+import {validateBrowserSnapshot} from '../lib/server/browser-snapshot.ts';
 import {handleApi} from '../lib/server/api.ts';
 import type {Config, Snapshot} from '../lib/spider/types.ts';
 
@@ -100,4 +101,11 @@ test('always-on runner ignores browser-provided accounts and missing browser quo
   assert.equal((await repo.running()).length,0);
   const response=await handleApi(new Request(`https://test.example/api/spiders/${bot.id}/tick`,{method:'POST',headers:{'content-type':'application/json','x-iteralpha-request':'1',origin:'https://test.example',cookie:`iteralpha_guest=${'d'.repeat(64)}`},body:JSON.stringify({version:0})}),{DB:db});
   const result=await response.json() as any;assert.equal(result.status,'paused');assert.equal(result.events.at(-1).reason,'feed-unavailable');assert.equal(result.trades.length,0);
+});
+
+test('active exchange symbols preserve Unicode ticker names without allowing URL syntax', () => {
+  const row={symbol:'币安人生USDT',baseAsset:'币安人生',quoteAsset:'USDT',status:'TRADING',isSpotTradingAllowed:true,filters:[{filterType:'LOT_SIZE',stepSize:'.01',minQty:'.01',maxQty:'1000000'}]};
+  const parsed=parseBinanceMarkets({symbols:[row,{...row,symbol:'BAD/USDT'},{...row,symbol:'BAD?USDT'}]});
+  assert.equal(parsed.length,1);assert.equal(parsed[0].base,'币安人生');assert.equal(parsed[0].id,'binance:币安人生USDT');
+  const accepted=validateBrowserSnapshot({...snapshot(now),market:parsed[0],source:'Binance Spot public market data'},parsed[0].id,60,now);assert.equal(accepted.market.base,'币安人生');
 });
