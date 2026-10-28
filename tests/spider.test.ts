@@ -109,3 +109,17 @@ test('active exchange symbols preserve Unicode ticker names without allowing URL
   assert.equal(parsed.length,1);assert.equal(parsed[0].base,'币安人生');assert.equal(parsed[0].id,'binance:币安人生USDT');
   const accepted=validateBrowserSnapshot({...snapshot(now),market:parsed[0],source:'Binance Spot public market data'},parsed[0].id,60,now);assert.equal(accepted.market.base,'币安人生');
 });
+
+test('fast paper settings are validated, persisted, and included in idempotency checks', async () => {
+  const db = database();
+  const body = {requestId: crypto.randomUUID(), feedMode: 'browser', browserSnapshot: {...snapshot(Date.now()), source: 'Binance Spot public market data'},
+    marketId: market.id, strategy: 'tape', interval: 60, initialCash: 10000, allocationPercent: 20, stopPercent: .3, targetPercent: .6,
+    evaluationSeconds: 5, cooldownSeconds: 15, feeBps: 60, slippageBps: 5};
+  const request = (value: unknown) => handleApi(new Request('https://test.example/api/spiders', {method: 'POST', headers: {'content-type': 'application/json', 'x-iteralpha-request': '1', origin: 'https://test.example', cookie: `iteralpha_guest=${'e'.repeat(64)}`}, body: JSON.stringify(value)}), {DB: db});
+  const created = await request(body); assert.equal(created.status, 200);
+  const saved = await created.json() as any; assert.equal(saved.config.evaluationSeconds, 5); assert.equal(saved.config.feeBps, 60); assert.equal(saved.config.strategy, 'tape');
+  assert.equal((await request(body)).status, 200);
+  assert.equal((await request({...body, feeBps: 10})).status, 409);
+  assert.equal((await request({...body, requestId: crypto.randomUUID(), evaluationSeconds: 1})).status, 400);
+  assert.equal((await request({...body, requestId: crypto.randomUUID(), feeBps: -1})).status, 400);
+});

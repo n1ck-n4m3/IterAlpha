@@ -1,8 +1,8 @@
 import {macd, rsi, sma} from '../training/indicators.ts';
 import type {Candle} from '../training/types.ts';
-import type {Interval, Signal, Strategy} from './types.ts';
+import type {BarStrategy, Interval, Signal} from './types.ts';
 
-export function evaluateStrategy(strategy: Strategy, candles: Candle[], interval: Interval, now: number, inPosition: boolean): Signal {
+export function evaluateStrategy(strategy: BarStrategy, candles: Candle[], interval: Interval, now: number, inPosition: boolean): Signal {
   const bars = candles.filter(c => (c.time + interval) * 1000 <= now);
   const closes = bars.map(c => c.close);
   const fast = sma(closes, 7).at(-1) ?? null;

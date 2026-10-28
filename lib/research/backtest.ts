@@ -1,8 +1,8 @@
 import {evaluateStrategy} from '../spider/strategy.ts';
-import type {Strategy} from '../spider/types.ts';
+import type {BarStrategy} from '../spider/types.ts';
 import type {ResearchConfig, ResearchData} from './schema.ts';
 
-export type ResearchPolicy = Strategy | 'cash' | 'buy-hold';
+export type ResearchPolicy = BarStrategy | 'cash' | 'buy-hold';
 export type ResearchFill = {
   side: 'buy' | 'sell'; time: number; signalTime: number | null;
   price: number; quantity: number; fee: number; netPnl: number | null;

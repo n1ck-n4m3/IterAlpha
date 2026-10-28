@@ -7,8 +7,10 @@ import {browserSnapshotSchema, validateBrowserSnapshot} from './browser-snapshot
 import {SpiderRepository} from './spider-repository.ts';
 
 export interface SpiderEnvironment extends MarketEnvironment {DB?: D1Database; SPIDER_RUNNER_KEY?: string}
-const startSchema = z.object({feedMode:z.enum(['server','browser']).default('server'),browserSnapshot:browserSnapshotSchema.optional(),requestId: z.string().uuid(), marketId: z.string().max(80), strategy: z.enum(['trend', 'reversion', 'breakout']),
+const startSchema = z.object({feedMode:z.enum(['server','browser']).default('server'),browserSnapshot:browserSnapshotSchema.optional(),requestId: z.string().uuid(), marketId: z.string().max(80), strategy: z.enum(['trend', 'reversion', 'breakout', 'tape']),
   interval: z.union([z.literal(60), z.literal(300), z.literal(900)]), initialCash: z.number().finite().min(0.0001).max(1_000_000_000),
+  evaluationSeconds: z.union([z.literal(5), z.literal(15), z.literal(30)]).default(5),
+  cooldownSeconds: z.number().int().min(0).max(300).default(0), feeBps: z.number().finite().min(0).max(200).default(10), slippageBps: z.number().finite().min(0).max(100).default(5),
   allocationPercent: z.number().finite().min(1).max(50).default(20), stopPercent: z.number().finite().min(0.2).max(10).default(1), targetPercent: z.number().finite().min(0.4).max(20).default(2)}).strict();
 const commandSchema = z.object({browserSnapshot:browserSnapshotSchema.optional(),version: z.number().int().min(0)}).strict();
 export async function runSpider(bot: Bot, env: SpiderEnvironment): Promise<Bot> {
@@ -35,7 +37,7 @@ export async function handleSpider(path: string, request: Request, env: SpiderEn
     const existing = await repo.find(owner, input.requestId);
     if (existing) {
       const c = existing.config;
-      if ((c.feedMode??'server')!==input.feedMode || c.market.id !== input.marketId || c.strategy !== input.strategy || c.interval !== input.interval || c.initialCash !== input.initialCash || c.allocationPercent !== input.allocationPercent || c.stopPercent !== input.stopPercent || c.targetPercent !== input.targetPercent) throw new TrainingError('This request ID belongs to another spider.', 409);
+      if ((c.feedMode??'server')!==input.feedMode || c.market.id !== input.marketId || c.strategy !== input.strategy || c.interval !== input.interval || c.initialCash !== input.initialCash || c.allocationPercent !== input.allocationPercent || c.stopPercent !== input.stopPercent || c.targetPercent !== input.targetPercent || (c.evaluationSeconds??5)!==input.evaluationSeconds || (c.cooldownSeconds??0)!==input.cooldownSeconds || (c.feeBps??10)!==input.feeBps || (c.slippageBps??5)!==input.slippageBps) throw new TrainingError('This request ID belongs to another spider.', 409);
       return publicBot(existing);
     }
     const direct=input.feedMode==='browser'?validateBrowserSnapshot(input.browserSnapshot,input.marketId,input.interval,Date.now()):null;
