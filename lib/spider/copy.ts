@@ -2,8 +2,8 @@ import type {Reason, Strategy} from './types.ts';
 export const SPIDER = {
   directFeed:'Direct exchange connection', directNote:'Your browser reads the exchange’s public feed. The server computes and saves the paper ledger. Browser-provided prices are unverified; these results are for personal practice and are not eligible for rankings.', browserUnavailable:'The exchange feed is unavailable from both the server and this browser. Trading remains paused.',
   process: 'Inside the decision loop', processNote: 'Recorded checks from the latest server update', stages: {market: 'Read live tape', signal: 'Evaluate setup', risk: 'Check limits', execution: 'Fill or wait'}, traceStatus: {passed: 'Checked', waiting: 'Waiting', blocked: 'Blocked', filled: 'Paper fill'}, observing: 'Reading the exchange…', quoteUnit: 'Quote asset', allExchanges: 'All exchanges', closePicker: 'Close market picker', dismiss: 'Dismiss error', chartStyle: 'Chart style', agentName: 'DECISION SPIDER', ma7: 'MA 7', ma25: 'MA 25', rsi14: 'RSI 14', macdHistogram: 'MACD histogram',
-  nav: 'Spider', eyebrow: 'LIVE MARKET · PAPER EXECUTION', title: 'Your strategy. A tireless observer.',
-  intro: 'Choose a market and a playbook. Watch the spider read the chart, act, and explain each move.',
+  nav: 'Spider', eyebrow: 'CRYPTO GTO · RESEARCH PREVIEW', title: 'Test the edge. Measure every move.',
+  intro: 'Observe live spot markets, test a rule strategy with virtual funds, and record its decisions. An optimal or profitable strategy has not been established.',
   paper: 'Virtual funds only', live: 'Live exchange data', unavailable: 'Feed unavailable', delayed: 'Feed delayed',
   search: 'Search every active spot pair…', venue: 'Exchange', market: 'Market', selectMarket: 'Choose a spot market',
   markets: 'active spot pairs', catalogError: 'The exchange directory is unavailable. Retry to load its current pairs.', retry: 'Retry',

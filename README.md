@@ -1,6 +1,10 @@
 # IterAlpha
 
-IterAlpha is an open-source, browser-based trading judgment trainer. It helps people learn, make a decision before the future is visible, review their reasoning, and practise again. The current MVP starts with crypto spot simulation. It does not place real trades or promise investment performance.
+IterAlpha is an open-source crypto spot research and paper-trading workspace with a trading judgment trainer. The Crypto GTO research direction tests whether bounded strategies have an advantage after costs; it does not implement a proven market equilibrium, place real trades, or promise investment performance. Coinbase Advanced is the first planned execution target, with separate adapters planned for other venues.
+
+The Spider workspace at `/app?view=spider` reads public Binance spot data, runs one of three fixed rule strategies with virtual funds, and saves paper decisions and fills. Where hosting cannot reach the public feed, a labeled browser connection supplies unverified prices for personal practice. Coinbase data remains permission-gated. No authenticated exchange order adapter or running open model is connected. The exchange inventory distinguishes implemented feeds from future integrations.
+
+A local research engine now tests the same rule signals chronologically, applies explicit cost assumptions, selects a frozen candidate for each next test window, and falls back to cash when no candidate passes. It stores all candidates, input/configuration/source hashes, fills, and experiment attempts. It is an OHLC approximation, not the live order-book fill engine or evidence of profitability. See [the research guide](docs/CRYPTO-GTO-RESEARCH.md) for formats, limitations, the multi-exchange plan, and the optional model's role.
 
 The homepage at `/` introduces two paths and includes an interactive decision preview and an opt-in early-access form. A visible Home link returns there from the training room at `/app`. The training room contains fresh generated BTC/ETH scenarios, a synthetic market lab, a decision journal, and progress history. The Foundations path adds a short beginner tutorial; Advanced Practice shows facts and uncertainty first. Reasons are optional taps, not writing assignments.
 
@@ -17,7 +21,7 @@ The homepage at `/` introduces two paths and includes an interactive decision pr
 
 The site records visited sections and timestamps. Signed-in visits include the account email; guest visits use a one-way anonymous identifier. IP addresses are not stored in this log. The dashboard shows the last 30 days and older entries are pruned as new visits arrive. Multiple visits by one visitor to the same section within 15 minutes count once.
 
-Synthetic practice paths are **not historical replays**. Each checkpoint separates visible price, range, and volume calculations from teaching interpretations and unknowns. The homepage preview is illustrative and does not save a trade. The project includes a historical snapshot adapter and a dormant Coinbase integration adapter; neither supplies prices to the public test. Using real data requires suitable storage and display rights plus reviewed snapshots. No brokerage account is connected.
+Synthetic practice paths are **not historical replays**. Each checkpoint separates visible price, range, and volume calculations from teaching interpretations and unknowns. The homepage preview is illustrative and does not save a trade. The training snapshot adapter and gated Coinbase adapter do not supply training scenes; Spider uses a separate public feed. Using historical data requires suitable usage rights and reviewed provenance. No brokerage account is connected.
 
 ## Run locally
 
@@ -31,6 +35,7 @@ npm run build
 node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_long_multiple_man.sql
 node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_bizarre_joystick.sql
 node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0002_concerned_pete_wisdom.sql
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0003_next_colonel_america.sql
 npm run start
 ```
 
@@ -46,6 +51,8 @@ The hosted demo uses Sites' built-in ChatGPT sign-in. This is not a standalone e
 | --- | --- |
 | `app/`, `components/` | Landing page, training room, market watch, and charts |
 | `lib/training/` | Simulation rules, order estimates, and review calculations |
+| `lib/spider/`, `lib/exchanges/` | Live-data paper rules, exchange inventory, and future authenticated spot ports |
+| `lib/research/` | Historical cost model and chronological finite-policy selection |
 | `lib/server/` | API, generated scenes, data adapters, storage, and optional coach |
 | `db/`, `drizzle/` | D1 schema and migrations |
 | `tests/` | API and engine tests |
@@ -55,6 +62,6 @@ The runtime needs a D1 binding named `DB`. If you deploy to a new host, create y
 
 ## Scope and license
 
-IterAlpha is a training environment for improving human judgment, not an AI trading bot. The existing feedback is rules-based until an AI service is configured. Market Lab is an explicitly synthetic visualization and never settles practice orders. Results from a few simulated rounds cannot establish trading skill or real-world profitability.
+IterAlpha currently includes a training environment, an automated rule-based paper spider, and a local research tool. The existing feedback is rules-based until an AI service is configured. Market Lab is an explicitly synthetic visualization and never settles practice orders. Results from a few simulated rounds cannot establish trading skill or real-world profitability. External market data has its own usage terms and is not covered by this repository's MIT license.
 
 Source code is available under the [MIT License](LICENSE). Product name and visual identity are part of IterAlpha's brand; MIT covers the repository's software and included assets subject to their own notices where indicated.

@@ -7,6 +7,7 @@ import {EXECUTION, stats} from '../lib/spider/engine';
 import AnimatedNumber from './animated-number';
 import {browserDirectory, browserSnapshot} from '../lib/spider/browser-feed';
 import SpiderChart from './spider-chart';
+import ExchangeCoverage from './exchange-coverage';
 
 type Catalog = {direct?: boolean; markets: Market[]; venues: {venue: string; status: string; count: number}[]};
 const number = (value: number, digits = 4) => new Intl.NumberFormat('en-US', {maximumFractionDigits: digits}).format(value);
@@ -95,6 +96,7 @@ export default function SpiderDesk() {
   function exportFills() {if (!bot) return; const rows = [['Time UTC', 'Market', 'Side', 'Quantity', 'Price', 'Fee', 'Quote asset', 'Net PnL', 'Reason'], ...bot.trades.map(t => [new Date(t.time).toISOString(), bot.config.market.symbol, t.side, t.quantity, t.price, t.fee, quote, t.netPnl ?? '', t.reason])]; const blob = new Blob([rows.map(r => r.join(',')).join('\n')], {type: 'text/csv'}); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `spider-${bot.id}.csv`; link.click(); URL.revokeObjectURL(link.href);}
   return <div className="sp-desk" onPointerMove={event => {const card = (event.target as HTMLElement).closest<HTMLElement>('.sp-chart-panel,.sp-controller,.sp-analysis'); if (!card) return; const box = card.getBoundingClientRect(); card.style.setProperty('--glow-x', `${event.clientX - box.left}px`); card.style.setProperty('--glow-y', `${event.clientY - box.top}px`);}}>
     <div className="sp-heading"><div><span className="eyebrow"><Radio size={13}/>{C.eyebrow}</span><h1>{C.title}</h1><p>{C.intro}</p></div><div className="sp-mode"><ShieldCheck size={15}/>{C.paper}</div></div>
+    <ExchangeCoverage/>
     {directMode&&<div className="sp-direct-notice"><Radio size={14}/><span><strong>{C.directFeed}</strong>{C.directNote}</span></div>}
     {error && <div className="sp-error" role="alert">{error}<button aria-label={C.dismiss} onClick={() => setError('')}><X size={14}/></button></div>}
     <div className="sp-marketbar"><div className="sp-market-picker"><button disabled={locked} aria-label={C.selectMarket} aria-expanded={picker} onClick={() => setPicker(!picker)}><span className="sp-coin">{base.slice(0, 1)}</span><span><strong>{base} <small>/ {quote}</small></strong><em>{market?.venue ?? 'Binance'} · SPOT</em></span>{!locked && <ChevronDown size={16}/>}</button>

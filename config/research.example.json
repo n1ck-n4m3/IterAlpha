@@ -1,0 +1,17 @@
+{
+  "version": "iteralpha-research-config-v1",
+  "initialCash": 10000,
+  "allocationPercent": 20,
+  "feeBps": 60,
+  "spreadBps": 10,
+  "slippageBps": 5,
+  "stopPercent": 1,
+  "targetPercent": 2,
+  "maxDrawdownPercent": 5,
+  "maxHoldBars": 12,
+  "maxPriorVolumePercent": 1,
+  "selectionBars": 2880,
+  "testBars": 1440,
+  "minimumTrades": 20,
+  "drawdownPenalty": 1
+}

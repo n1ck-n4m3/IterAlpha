@@ -1,6 +1,8 @@
 import type {Candle} from '../training/types.ts';
+import type {ExchangeId} from '../exchanges/types.ts';
 
-export type Venue = 'binance' | 'coinbase';
+// Only implemented feeds belong here; roadmap venues must not enter runtime routing.
+export type Venue = Extract<ExchangeId, 'binance' | 'coinbase'>;
 export type Interval = 60 | 300 | 900;
 export type Strategy = 'trend' | 'reversion' | 'breakout';
 export type Market = {

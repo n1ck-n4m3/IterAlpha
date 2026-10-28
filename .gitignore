@@ -14,3 +14,6 @@ dist/
 
 # Owner reference material is not website source.
 /The-Mom-Test-en.pdf
+
+# Private research inputs, experiment ledgers, and account exports.
+.research/
