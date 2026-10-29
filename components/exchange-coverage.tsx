@@ -2,8 +2,8 @@ import {ArrowUpRight, ChevronDown, Layers3} from 'lucide-react';
 import {EXCHANGES} from '../lib/exchanges/registry';
 import {EXCHANGE_COPY as C} from '../lib/exchanges/copy';
 
-export default function ExchangeCoverage() {
-  return <details className="sp-exchanges">
+export default function ExchangeCoverage({defaultOpen = false}: {defaultOpen?: boolean}) {
+  return <details open={defaultOpen} className="sp-exchanges">
     <summary><Layers3 size={16}/><span><strong>{C.title}</strong><small>{C.summary}</small></span><ChevronDown size={15}/></summary>
     <div className="sp-exchange-body"><p>{C.description}</p><div className="sp-exchange-grid">{EXCHANGES.map(exchange =>
       <article key={exchange.id} className={exchange.priority === 1 ? 'first' : ''}>

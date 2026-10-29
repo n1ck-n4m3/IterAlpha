@@ -8,6 +8,8 @@ A local research engine now tests the same rule signals chronologically, applies
 
 Spider controls now serialize ledger updates, reconcile version conflicts, and expose processing and failure states. Pause is idempotent. A Decision evidence inspector preserves each new check's observed quotes, costs, rule proposal, risk checks, and paper result. Chart intervals can change without changing a saved strategy. Saved server-feed accounts can explicitly switch to unverified browser quotes when needed. Sound settings include a test tone and persist across navigation, including a zero volume. See the [open-source architecture review and iteration guide](docs/OPEN-SOURCE-TRADING-REVIEW.md) for the 22-project comparison, applied changes, and next steps.
 
+The Spider interface is now a visual cyber cockpit: a live chart, animated four-stage spider arena, position ring, changing depth bars, and a seekable recorded-check replay. Full settings and evidence remain available in drawers. Motion controls and reduced-motion preferences are supported. The animation is a visualization of recorded checks, not a claim of an active AI model. See [the cockpit guide](docs/CYBER-COCKPIT.md).
+
 The homepage at `/` introduces two paths and includes an interactive decision preview and an opt-in early-access form. A visible Home link returns there from the training room at `/app`. The training room contains fresh generated BTC/ETH scenarios, a synthetic market lab, a decision journal, and progress history. The Foundations path adds a short beginner tutorial; Advanced Practice shows facts and uncertainty first. Reasons are optional taps, not writing assignments.
 
 ## What works today
