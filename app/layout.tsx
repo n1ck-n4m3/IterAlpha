@@ -7,6 +7,7 @@ import "./learning.css";
 import VisitTracker from '../components/visit-tracker';
 import InteractionEffects from '../components/interaction-effects';
 import {LocaleProvider} from '../components/locale-provider';
+import {AudioProvider} from '../components/audio-provider';
 
 export const metadata: Metadata = {
   title: "IterAlpha — Train your judgment",
@@ -24,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased"><LocaleProvider>{children}<VisitTracker/><InteractionEffects/></LocaleProvider></body>
+      <body className="antialiased"><LocaleProvider><AudioProvider>{children}<VisitTracker/><InteractionEffects/></AudioProvider></LocaleProvider></body>
     </html>
   );
 }

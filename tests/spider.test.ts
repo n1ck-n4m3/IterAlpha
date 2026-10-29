@@ -77,7 +77,7 @@ test('spider controls require owner, same-origin request and valid schema; runne
   assert.equal((await request(path, {version: 0}, undefined, {origin: 'https://evil.example'})).status, 403);
   assert.equal((await request(path, {version: 0, cash: 100000})).status, 400);
   assert.equal((await request(path, {version: 0})).status, 200);
-  assert.equal((await request(path, {version: 0})).status, 409);
+  assert.equal((await request(path, {version: 0})).status, 200);
   assert.equal((await request('/api/spider/run', {})).status, 404);
 });
 
@@ -122,4 +122,39 @@ test('fast paper settings are validated, persisted, and included in idempotency 
   assert.equal((await request({...body, feeBps: 10})).status, 409);
   assert.equal((await request({...body, requestId: crypto.randomUUID(), evaluationSeconds: 1})).status, 400);
   assert.equal((await request({...body, requestId: crypto.randomUUID(), feeBps: -1})).status, 400);
+});
+
+
+test('stale pause safely stops the latest saved version and cannot be undone by an older tick', async () => {
+  const db = database(), repo = new SpiderRepository(db), owner = `guest:${'f'.repeat(64)}`;
+  const bot = createBot(crypto.randomUUID(), owner, {...config, feedMode: 'browser'}, Date.now() - 10000); await repo.create(bot);
+  const updated = advanceBot(bot, snapshot(Date.now()), Date.now()); assert(await repo.save(bot, updated));
+  const response = await handleApi(new Request(`https://test.example/api/spiders/${bot.id}/pause`, {method: 'POST', headers: {'content-type': 'application/json', 'x-iteralpha-request': '1', origin: 'https://test.example', cookie: `iteralpha_guest=${'f'.repeat(64)}`}, body: JSON.stringify({version: 0})}), {DB: db});
+  assert.equal(response.status, 200); const stopped = await response.json() as any; assert.equal(stopped.status, 'paused'); assert(stopped.version > updated.version);
+  const competing = advanceBot(updated, snapshot(Date.now() + 5000), Date.now() + 5000); assert.equal(await repo.save(updated, competing), false);
+  assert.equal((await repo.find(owner, bot.id))?.status, 'paused');
+});
+test('explicit feed recovery preserves an existing paper ledger and requires a paused owned Binance account', async () => {
+  const db = database(), repo = new SpiderRepository(db), owner = `guest:${'1'.repeat(64)}`;
+  const bot = advanceBot(createBot(crypto.randomUUID(), owner, config, Date.now() - 10000), snapshot(Date.now()), Date.now()); bot.status = 'paused'; await repo.create(bot);
+  const send = (body: unknown) => handleApi(new Request(`https://test.example/api/spiders/${bot.id}/browser-feed`, {method: 'POST', headers: {'content-type': 'application/json', 'x-iteralpha-request': '1', origin: 'https://test.example', cookie: `iteralpha_guest=${'1'.repeat(64)}`}, body: JSON.stringify(body)}), {DB: db});
+  assert.equal((await send({version: bot.version})).status, 400);
+  const response = await send({version: bot.version, browserSnapshot: {...snapshot(Date.now()), source: 'Binance Spot public market data'}});
+  assert.equal(response.status, 200); const result = await response.json() as any;
+  assert.equal(result.config.feedMode, 'browser'); assert.equal(result.status, 'paused'); assert.equal(result.dataIntegrity, 'browser-provided'); assert.equal(result.rankEligible, false);
+  assert.equal(result.cash, bot.cash); assert.equal(result.quantity, bot.quantity); assert.deepEqual(result.trades, bot.trades);
+  assert.equal((await send({version: bot.version, browserSnapshot: {...snapshot(Date.now()), source: 'Binance Spot public market data'}})).status, 409);
+});
+
+
+test('each new decision check preserves observed input and distinguishes a proposal from execution', () => {
+  const observed = snapshot(), originalBid = observed.bid;
+  const bot = createBot('evidence', 'owner', {...config, feeBps: 12, slippageBps: 6, feedMode: 'browser'}, now);
+  const updated = advanceBot(bot, observed, now + 5000), evidence = updated.cycles!.at(-1)!.evidence!;
+  assert.equal(evidence.model, 'not-connected'); assert.equal(evidence.feed, 'browser-provided'); assert.equal(evidence.bid, originalBid);
+  assert.equal(evidence.proposedAction, 'buy'); assert.equal(evidence.cashBefore, 10000); assert.equal(evidence.quantityBefore, 0);
+  assert.equal(evidence.feeBps, 12); assert.equal(evidence.slippageBps, 6); assert(evidence.checks.some(check => check.status === 'filled'));
+  observed.bid = 1; updated.trace![0].status = 'blocked'; assert.equal(evidence.bid, originalBid); assert.equal(evidence.checks[0].status, 'passed');
+  const wide = snapshot(); wide.ask = wide.bid * 1.01; wide.asks[0].price = wide.ask;
+  const blocked = advanceBot(bot, wide, now + 5000).cycles!.at(-1)!; assert.equal(blocked.evidence?.proposedAction, 'buy'); assert.equal(blocked.action, 'hold'); assert.equal(blocked.reason, 'spread');
 });

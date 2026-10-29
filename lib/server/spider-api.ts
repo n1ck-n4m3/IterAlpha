@@ -51,13 +51,29 @@ export async function handleSpider(path: string, request: Request, env: SpiderEn
     if (!await repo.create(bot)) throw new TrainingError('Pause your running spider before starting another. Limit: 20 new paper accounts per day.', 409);
     return publicBot(bot);
   }
-  const match = path.match(/^\/api\/spiders\/([0-9a-f-]{36})\/(tick|pause|resume|close)$/);
+  const match = path.match(/^\/api\/spiders\/([0-9a-f-]{36})\/(tick|pause|resume|close|browser-feed)$/);
   if (!match || request.method !== 'POST') throw new TrainingError('Not found.', 404);
   const bot = await repo.find(owner, match[1]); if (!bot) throw new TrainingError('Spider not found.', 404);
   const input = commandSchema.parse(await readBody(request, 131072));
+  // Stopping is idempotent and must not be defeated by an in-flight observation.
+  if (match[2] === 'pause') {
+    let current = bot;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (current.status === 'paused') return publicBot(current);
+      const stopped = pauseBot(current, Date.now());
+      if (await repo.save(current, stopped)) return publicBot(stopped);
+      const latest = await repo.find(owner, bot.id); if (!latest) throw new TrainingError('Spider not found.', 404); current = latest;
+    }
+    throw new TrainingError('The pause could not be confirmed. Reload the saved account.', 409);
+  }
   if (match[2] !== 'tick' && input.version !== bot.version) throw new TrainingError('The spider changed. Refresh before sending this control again.', 409);
   let next: Bot;
-  if (match[2] === 'pause') next = pauseBot(bot, Date.now());
+  if (match[2] === 'browser-feed') {
+    if (bot.status !== 'paused' || bot.config.market.venue !== 'binance') throw new TrainingError('Pause a Binance paper account before changing its feed.', 409);
+    const observed = validateBrowserSnapshot(input.browserSnapshot, bot.config.market.id, bot.config.interval, Date.now());
+    if (!snapshotUsable(observed, Date.now())) throw new TrainingError('A fresh browser quote is required.', 503);
+    next = {...bot, version: bot.version + 1, updatedAt: Date.now(), config: {...bot.config, feedMode: 'browser'}, tape: [], tapeReading: undefined};
+  }
   else if (match[2] === 'tick' && bot.config.feedMode === 'browser' && !input.browserSnapshot) next = pauseBot(bot, Date.now(), 'feed-unavailable');
   else if (match[2] === 'tick' && bot.config.feedMode !== 'browser') next = await runSpider(bot, env);
   else {

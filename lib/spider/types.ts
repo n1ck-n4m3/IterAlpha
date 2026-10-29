@@ -32,7 +32,10 @@ export type Trace = {stage: 'market' | 'signal' | 'risk' | 'execution'; status: 
 export type TapePoint = {time: number; quoteTime: number; mid: number};
 export type TapeReading = {samples: number; windowSeconds: number; momentumBps: number | null; spreadBps: number; imbalance: number;
   roundTripCostBps: number; thresholdBps: number; ready: boolean};
-export type Cycle = {time: number; equity: number; price: number; action: 'buy' | 'sell' | 'hold'; reason: Reason; strategyEvaluated: boolean};
+export type DecisionEvidence = {schema: 1; feed: 'browser-provided' | 'server-observed'; source: string; quoteTime: number; bid: number; ask: number; quoteAgeMs: number; spreadBps: number;
+  feeBps: number; slippageBps: number; proposedAction: Signal['action'] | null; model: 'not-connected'; checks: Trace[];
+  cashBefore: number; quantityBefore: number; momentum: 'rising' | 'falling' | 'flat' | 'warming'; pressure: 'bid-heavy' | 'ask-heavy' | 'balanced' | 'unavailable'};
+export type Cycle = {time: number; equity: number; price: number; action: 'buy' | 'sell' | 'hold'; reason: Reason; strategyEvaluated: boolean; evidence?: DecisionEvidence};
 export type Bot = {
   id: string; owner: string; version: number; status: 'running' | 'paused'; config: Config;
   cash: number; quantity: number; entryCost: number; entryPrice: number; entryTime: number;

@@ -125,7 +125,15 @@ export function advanceBot(previous: Bot, snapshot: Snapshot, now: number, comma
   const latestFill = bot.trades.at(-1), action = latestFill && latestFill.id !== previous.trades.at(-1)?.id ? latestFill.side : 'hold';
   const reason = action !== 'hold' ? latestFill!.reason : bot.events.at(-1)?.reason ?? 'waiting';
   bot.cycleCount = (bot.cycleCount ?? 0) + 1;
-  const cycle: Cycle = {time: now, equity: ending, price: snapshot.bid, action, reason, strategyEvaluated};
+  const reading = bot.tapeReading;
+  const cycle: Cycle = {time: now, equity: ending, price: snapshot.bid, action, reason, strategyEvaluated, evidence: {
+    schema: 1, feed: bot.config.feedMode === 'browser' ? 'browser-provided' : 'server-observed', source: snapshot.source, quoteTime: snapshot.quoteTime,
+    bid: snapshot.bid, ask: snapshot.ask, quoteAgeMs: Math.max(0, now - snapshot.quoteTime), spreadBps: (snapshot.ask / snapshot.bid - 1) * 10000,
+    feeBps: bot.config.feeBps ?? EXECUTION.fee * 10000, slippageBps: bot.config.slippageBps ?? EXECUTION.slippage * 10000, proposedAction: strategyEvaluated ? bot.signal?.action ?? null : null, model: 'not-connected', checks: structuredClone(bot.trace),
+    cashBefore: previous.cash, quantityBefore: previous.quantity,
+    momentum: reading?.momentumBps == null ? 'warming' : reading.momentumBps > 5 ? 'rising' : reading.momentumBps < -5 ? 'falling' : 'flat',
+    pressure: !reading ? 'unavailable' : reading.imbalance > .1 ? 'bid-heavy' : reading.imbalance < -.1 ? 'ask-heavy' : 'balanced',
+  }};
   bot.cycles = [...(bot.cycles ?? []), cycle].slice(-180);
   return bot;
 }
