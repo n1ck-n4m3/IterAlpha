@@ -4,7 +4,7 @@ Research date: November 2, 2026. Owner-facing analysis; product and source copy 
 
 ## 本质与取舍
 
-产品的主任务改为：**用户选高层策略 → Agent 自动处理纸面订单 → 用户看懂动作与扣费后盈亏**。Simple 与 Pro 是同一账户的两个观察窗口，不是两个产品。原有手动训练保留为次要工具。
+产品的主任务改为：**用户选高层策略 → Agent 自动处理纸面订单 → 用户看懂动作与扣费后盈亏**。Simple 与 Pro 是同一账户的两个观察窗口，不是两个产品。原有手动 Play 已归档：主导航与首页不再推广，默认 `/app` 不初始化或创建练习回合；已有记录保留在 More → Practice archive。短场景选择与规则反馈不等于有效训练，也没有经过学习效果验证。
 
 暂时不做从零训练，不把模型名称、漂亮动画或一次盈利当作交易优势。没有可以公开证明对任意 crypto 市场始终最优的“GTO 决策器”。有价值的是可检验的策略、可复现的执行，以及市场变动下仍能解释清楚的结果。
 
@@ -96,3 +96,15 @@ const assessment = await shadowTradingJudgment(savedBotView, savedCycle, environ
 ## 场景界面的视觉参考
 
 参考 [Rotli](https://rotli.co/) 的清晰叙事、[Devolfs](https://www.devolfs.com/) 的产品表达、[Linear](https://linear.app/) 的细节层次以及 [Reflect](https://reflect.app/) 的渐进展开。借鉴的是留白、内容层次、按需展开的交互原则，不复制它们的资产或源代码。场景由 React、SVG、CSS 动画与已有 WebGL 氛围层构成；更换的是前端组合与布局骨架，后端账本和风险规则保持一致。
+
+## Why Play is archived
+
+现阶段的 Play 缺少明确训练目标、真实决策环境的迁移验证、稳定对照基线，以及反复练习后的能力测量。它能够演示下单与复盘交互，但不足以承担产品的核心训练承诺。因此保留数据与兼容路由，移除主入口，并停止 Agent 页面加载与其无关的练习数据和教练请求。
+
+后续只在有实质训练内容时重做：使用真实 Agent 决策快照，展示用户选择的高层策略如何影响仓位与成本；在相同历史区间与相同费用条件下比较策略；用未见数据和明确指标检验改进。单次路径中的事后更优选择不称为 EV 或能力提升。
+
+## Current market-data scope
+
+Agent 目前使用 Binance 所选现货币对的 K 线、ticker 和可见盘口快照，通常每 5 秒轮询；不是 WebSocket 连续逐笔行情，也不是全部交易所汇总。每次读取最多 100 档盘口，Tape 策略和 Pro 的盘口占比统一使用每侧前 10 档的报价币金额（价格 × 数量）。这不是独立买家/卖家人数、已经成交的资金流，或保证能够成交的流动性；挂单可能在实际执行前改变或取消。公开接口没有独立交易者身份，因此不能由这些数据推导实时参与人数。
+
+参考 [Binance order-book and trade API definitions](https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/rest-api/market)。逐笔/聚合成交流、新闻、链上活动和资金费率尚未接入。策略信号与指标是代码基于行情计算的解释；Agent 订单、费用、滑点和盈亏来自纸面执行假设。浏览器提供的快照标记为 unverified，接收时刻不等于交易所事件时刻。原 Play 的价格仍是合成场景，与实时 Agent 分开。

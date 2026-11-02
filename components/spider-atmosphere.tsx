@@ -5,7 +5,13 @@ const fragment = `precision mediump float;
 uniform vec2 resolution;uniform float time;
 void main(){vec2 uv=gl_FragCoord.xy/resolution;vec2 p=uv*2.-1.;p.x*=resolution.x/resolution.y;
 float glow=0.;float blue=0.;for(int i=0;i<7;i++){float f=float(i);float y=p.y+.34*sin(p.x*.8+time*.16+f*.09)+.13*cos(p.x*1.8-time*.12+f*.1);float line=.0025/abs(y+.56+f*.035);glow+=min(.12,line);blue+=.0015/max(.02,abs(y+.75+f*.025));}
-float halo=exp(-length(p-vec2(1.,.25))*.9)*.05;vec3 c=vec3(.006,.008,.02)+glow*vec3(.36,.12,.63)+blue*vec3(.02,.12,.18)+halo*vec3(.4,.12,.7);
+float warmth=.5+.5*sin(time*.055);
+vec2 redPoint=p-vec2(-.95+.18*sin(time*.045),-.15+.14*cos(time*.035));
+vec2 purplePoint=p-vec2(.8+.16*cos(time*.04),.35+.1*sin(time*.05));
+float crimson=exp(-dot(redPoint,redPoint)*.9)*(.12+.04*warmth);
+float violet=exp(-dot(purplePoint,purplePoint)*.8)*(.1+.04*(1.-warmth));
+vec3 ribbon=mix(vec3(.52,.035,.14),vec3(.32,.09,.57),smoothstep(-1.2,1.2,p.x));
+vec3 c=vec3(.009,.004,.012)+glow*ribbon+blue*vec3(.08,.025,.12)+crimson*vec3(.65,.035,.12)+violet*vec3(.38,.06,.66);
 gl_FragColor=vec4(c,1.);}`;
 /** Decorative shader only. Financial values never come from this canvas. */
 export default function SpiderAtmosphere({motion}: {motion: boolean}) {

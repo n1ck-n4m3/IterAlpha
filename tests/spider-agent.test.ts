@@ -18,3 +18,12 @@ test('shadow provider has no order authority and leaves the account immutable',a
 test('invalid URLs, provider errors, and oversized responses cannot become model success',async()=>{const bot=account();assert.equal((await shadowTradingJudgment(bot,cycle,{...env,SPIDER_DECISION_URL:'https://user:password@judge.example'},async()=>{throw new Error('must not run');})).status,'not-configured');assert.equal((await shadowTradingJudgment(bot,cycle,env,async()=>new Response('unavailable',{status:503}))).status,'unavailable');assert.equal((await shadowTradingJudgment(bot,cycle,env,async()=>new Response('x'.repeat(17000)))).status,'unavailable');});
 const job={version:'iteralpha-training-job-v1',jobId:'paper-labels-v1',method:'calibration',baseModel:DECISION_MODEL,revision:DECISION_REVISION,dataset:{uri:'file:///datasets/paper-labels.jsonl',sha256:'d'.repeat(64),provenance:'Owner-provided data with recorded cutoff evidence.',rightsConfirmed:true,trainEnd:'2026-01-01T00:00:00Z',validationStart:'2026-01-02T00:00:00Z',validationEnd:'2026-02-01T00:00:00Z',testStart:'2026-02-02T00:00:00Z',testEnd:'2026-03-01T00:00:00Z',purgeSeconds:3600,labelHorizonSeconds:3600},evaluation:{feeBps:10,slippageBps:5,baselines:['cash','buy-and-hold','rule-strategy'],walkForward:true}};
 test('training jobs enforce chronological holdouts, label embargoes, provenance and baselines',()=>{assert(trainingJobSchema.safeParse(job).success);assert(!trainingJobSchema.safeParse({...job,dataset:{...job.dataset,validationStart:job.dataset.trainEnd}}).success);assert(!trainingJobSchema.safeParse({...job,dataset:{...job.dataset,purgeSeconds:60}}).success);assert(!trainingJobSchema.safeParse({...job,dataset:{...job.dataset,rightsConfirmed:false}}).success);assert(!trainingJobSchema.safeParse({...job,evaluation:{...job.evaluation,baselines:['cash','cash','cash']}}).success);});
+
+test('visible order-book shares use quote value and ignore levels outside the displayed scope',async()=>{
+  const {visibleBookBalance}=await import('../lib/spider/order-book.ts');
+  const equal=visibleBookBalance({bids:[{price:100,quantity:1}],asks:[{price:1,quantity:100}]});
+  assert.equal(equal.bidShare,.5);assert.equal(equal.imbalance,0);
+  const bids=Array.from({length:10},()=>({price:100,quantity:1})),asks=Array.from({length:10},()=>({price:100,quantity:1}));
+  assert.equal(visibleBookBalance({bids:[...bids,{price:1e6,quantity:1e6}],asks}).bidShare,.5);
+  assert.equal(visibleBookBalance({bids:[],asks:[]}).bidShare,null);
+});

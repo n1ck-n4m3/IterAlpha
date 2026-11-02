@@ -1,3 +1,4 @@
+import {visibleBookBalance} from './order-book.ts';
 import {roundTripCostBps} from './costs.ts';
 import type {Config, Signal, Snapshot, TapePoint, TapeReading} from './types.ts';
 
@@ -18,9 +19,7 @@ export function evaluateTape(config: Config, points: TapePoint[], snapshot: Snap
   const window = latest ? points.filter(point => point.time >= (reference?.time ?? latest.time - 30_000)) : [];
   const fresh = !!latest && now - latest.time <= 7500 && now - snapshot.quoteTime <= 7500;
   const momentum = reference && latest ? (latest.mid / reference.mid - 1) * 10_000 : null;
-  const bidDepth = snapshot.bids.slice(0, 10).reduce((sum, level) => sum + level.price * level.quantity, 0);
-  const askDepth = snapshot.asks.slice(0, 10).reduce((sum, level) => sum + level.price * level.quantity, 0);
-  const imbalance = (bidDepth - askDepth) / (bidDepth + askDepth);
+  const {imbalance} = visibleBookBalance(snapshot);
   const cost = roundTripCostBps(config, snapshot.bid, snapshot.ask);
   // This is a historical-momentum hurdle, not a prediction or an estimate of future EV.
   const threshold = Math.max(5, cost * 1.5);

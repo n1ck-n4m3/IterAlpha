@@ -4,6 +4,7 @@ import {useEffect, useState} from 'react';
 import type {BotView, Cycle, Snapshot} from '../lib/spider/types';
 import type {BotStats} from '../lib/spider/types';
 import {COCKPIT as C, normalizedSeries} from '../lib/spider/cockpit';
+import {visibleBookBalance} from '../lib/spider/order-book';
 import {SPIDER} from '../lib/spider/copy';
 const number=(value:number,digits=2)=>new Intl.NumberFormat('en-US',{maximumFractionDigits:digits}).format(value);
 export function Sparkline({values,className='',label}: {values:number[];className?:string;label:string}) {
@@ -11,10 +12,11 @@ export function Sparkline({values,className='',label}: {values:number[];classNam
   return path?<svg className={`cy-sparkline ${className}`} viewBox="0 0 240 46" role="img" aria-label={label}><path d={path}/></svg>:<div className="cy-spark-empty" aria-label={C.noHistory}/>;
 }
 export function DepthInstrument({snapshot}: {snapshot:Snapshot|null}) {
-  const bids=snapshot?.bids.slice(0,12)??[],asks=snapshot?.asks.slice(0,12)??[],totalBid=bids.reduce((sum,level)=>sum+level.quantity,0),totalAsk=asks.reduce((sum,level)=>sum+level.quantity,0),max=Math.max(1e-12,...bids.map(level=>level.quantity),...asks.map(level=>level.quantity));
-  const pressure=(totalBid+totalAsk)>0?totalBid/(totalBid+totalAsk):null;
-  return <section className="cy-depth cy-panel"><div className="cy-panel-head"><h2><Radio size={12}/>{C.depth}</h2><span>{snapshot?`${((snapshot.ask/snapshot.bid-1)*10000).toFixed(2)} bp`:'—'} <i>{C.spread}</i></span></div><div className="cy-depth-vis" role="img" aria-label={pressure===null?C.noDepth:`${C.buySide} ${(pressure*100).toFixed(0)}% · ${C.sellSide} ${((1-pressure)*100).toFixed(0)}%`}>
-    <div className="cy-depth-bars bids">{bids.map((level,index)=><i key={index} style={{height:`${Math.max(5,Math.sqrt(level.quantity/max)*100)}%`}} title={`${number(level.price,8)} × ${number(level.quantity,8)}`}/>)}</div><div className="cy-depth-mid"><span>{snapshot?number(snapshot.bid, snapshot.bid<1?8:2):'—'}</span><i/></div><div className="cy-depth-bars asks">{asks.map((level,index)=><i key={index} style={{height:`${Math.max(5,Math.sqrt(level.quantity/max)*100)}%`}} title={`${number(level.price,8)} × ${number(level.quantity,8)}`}/>)}</div>
+  const balance=snapshot?visibleBookBalance(snapshot):null,bids=balance?.bids??[],asks=balance?.asks??[];
+  const max=Math.max(1e-12,...bids.map(level=>level.price*level.quantity),...asks.map(level=>level.price*level.quantity));
+  const pressure=balance?.bidShare??null;
+  return <section className="cy-depth cy-panel"><div className="cy-panel-head"><h2><Radio size={12}/>{C.depth}<span className="cy-data-help" tabIndex={0} aria-label={C.depthScope}><span aria-hidden="true">?</span><span className="cy-data-tooltip" role="tooltip">{C.depthScope}</span></span></h2><span>{snapshot?`${((snapshot.ask/snapshot.bid-1)*10000).toFixed(2)} bp`:'—'} <i>{C.spread}</i></span></div><div className="cy-depth-vis" role="img" aria-label={pressure===null?C.noDepth:`${C.buySide} ${(pressure*100).toFixed(0)}% · ${C.sellSide} ${((1-pressure)*100).toFixed(0)}%`}>
+    <div className="cy-depth-bars bids">{bids.map((level,index)=><i key={index} style={{height:`${Math.max(5,Math.sqrt(level.price*level.quantity/max)*100)}%`}} title={`${number(level.price,8)} × ${number(level.quantity,8)}`}/>)}</div><div className="cy-depth-mid"><span>{snapshot?number(snapshot.bid, snapshot.bid<1?8:2):'—'}</span><i/></div><div className="cy-depth-bars asks">{asks.map((level,index)=><i key={index} style={{height:`${Math.max(5,Math.sqrt(level.price*level.quantity/max)*100)}%`}} title={`${number(level.price,8)} × ${number(level.quantity,8)}`}/>)}</div>
   </div><div className="cy-pressure-track"><i style={{width:`${(pressure??.5)*100}%`}}/></div><div className="cy-depth-label"><span>{C.bid} <b>{pressure===null?'—':`${(pressure*100).toFixed(0)}%`}</b></span><span><b>{pressure===null?'—':`${((1-pressure)*100).toFixed(0)}%`}</b> {C.ask}</span></div></section>;
 }
 export function PositionInstrument({bot,metrics,snapshot}: {bot:BotView|null;metrics:BotStats|null;snapshot:Snapshot|null}) {

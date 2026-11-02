@@ -1,0 +1,71 @@
+/* Obsidian, aubergine, and oxblood remain decorative; financial colors retain their meaning. */
+:root{--bg:#080509;--panel:#150c18;--line:#d5a2d31e;--text:#f5eaf5;--muted:#b69eb7}
+body{background:#080509}
+.landing{background:radial-gradient(ellipse 60% 19% at 95% 23%,#2b0d212e,transparent 85%),radial-gradient(ellipse 70% 24% at 0 65%,#440e1c26,transparent 82%),#080509}
+.landing-header{background:#0c060ecf;border-color:#dcb0d61a;box-shadow:0 9px 42px #05010755}
+.landing-hero{background:#09050b;border-color:#9a4d7526}
+.hero-atmosphere{background:radial-gradient(600px circle at var(--mx,75%) var(--my,45%),#9c305d1b,transparent 75%),radial-gradient(ellipse 58% 65% at 85% 45%,#2d0d3a,transparent 75%),linear-gradient(125deg,#080509 9%,#180815 58%,#200a20 100%)}
+.hero-aurora{background:radial-gradient(ellipse 27% 35% at 72% 34%,#7d1e6370,transparent 76%),radial-gradient(ellipse 33% 37% at 89% 72%,#5d1d866d,transparent 78%),radial-gradient(ellipse 30% 30% at 28% 76%,#7c142e4a,transparent 82%);filter:blur(65px)}
+.hero-spectrum i{background:conic-gradient(from 165deg,transparent 0 27%,#69243e55 34%,#9e396e9c 42%,#8237b276 49%,transparent 61% 78%,#8e193c55 88%,transparent 96%);filter:blur(17px);opacity:.7}
+.hero-orbit{border-color:#b377a21a;box-shadow:inset 0 0 100px #6c22440d,0 0 80px #874a8d15}
+.hero-ribbon{background:linear-gradient(100deg,transparent 12%,#6e1e3540 36%,#87418b35 57%,transparent 82%)}
+.hero-wavefield{filter:drop-shadow(0 0 8px #b861943f);opacity:.62}
+.hero-grid{opacity:.45;background:repeating-linear-gradient(90deg,transparent 0 46px,#b8648c1c 47px 48px),repeating-linear-gradient(0deg,transparent 0 45px,#8855811c 46px 47px)}
+.hero-noise{background-image:radial-gradient(#d6a5c460 .6px,transparent .8px)}
+.landing-hero:after{background:linear-gradient(transparent,#080509)}
+.landing-progress{background:linear-gradient(90deg,#6c1738,#a77ac4 55%,#a84366);box-shadow:0 0 24px #773b8c}
+.landing-header-cta,.landing-primary{box-shadow:inset 0 1px #ffddff22,0 7px 30px #74204328}
+.nav-dropdown .nav-menu,.mobile-nav>div{background:#160b1af5;border-color:#af7caa43}
+.landing [data-spotlight]{background-image:radial-gradient(360px circle at var(--mx,50%) var(--my,50%),#9d3e6920,transparent 68%),linear-gradient(145deg,#21101f,#100a13 65%)}
+.landing .path-advanced[data-spotlight]{background-image:radial-gradient(360px circle at var(--mx,50%) var(--my,50%),#9560b62a,transparent 68%),linear-gradient(145deg,#24102d,#100914 70%)}
+.landing .product-grid [data-spotlight],.landing .method-grid [data-spotlight],.landing .privacy-grid [data-spotlight]{background-image:radial-gradient(270px circle at var(--mx,50%) var(--my,50%),#a4456c1c,transparent 70%),linear-gradient(160deg,#1c0d1c,#0f0812)}
+.landing-method{background:radial-gradient(ellipse at 3% 70%,#4d0d2025,transparent 65%),#0d0710}
+.landing-privacy{background:radial-gradient(ellipse at 100% 50%,#35114338,transparent 75%),#100811;border-color:#65415d44}
+.landing-about blockquote{background:linear-gradient(140deg,#2c1225,#160c1c);border-color:#9c688b4a}
+.landing-access{background:radial-gradient(ellipse at 0 100%,#60142e28,transparent 60%),linear-gradient(145deg,#27102a,#100914);border-color:#98759638}
+.landing .ap-spider .cyber-pet{filter:drop-shadow(-25px 8px 25px #a52b4930) drop-shadow(25px -10px 35px #8e48cb22)}
+.landing .ap-detail{background:linear-gradient(120deg,#2b132478,#1c102078);border-color:#b77ca92a}
+.landing .ap-stages button{background:linear-gradient(125deg,#35182b9c,#1a0d21b5);border-color:#b980ae25}
+.landing .ap-stages button.active{background:#431b36bb;border-color:#d2a4cb70}
+.spider-shell.app-shell{background:#080509}
+.cyber-desk{background:#09050b}
+.cy-atmosphere{background:radial-gradient(ellipse at 8% 70%,#40101e,transparent 68%),radial-gradient(ellipse at 90% 20%,#291039,transparent 65%),#09050b}
+.cy-atmosphere:after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 55% 65% at 0 54%,#6d15292d,transparent 74%),radial-gradient(ellipse 45% 65% at 100% 70%,#481a5b24,transparent 78%);animation:dark-spider-drift 25s ease-in-out infinite alternate}
+.cy-grid{opacity:.19;filter:sepia(.2)}
+.cy-vignette{background:radial-gradient(ellipse at 50% 42%,transparent 15%,#07030988 90%)}
+.ow-nebula{background:radial-gradient(ellipse at 45% 42%,#602b7c32,transparent 37%),radial-gradient(ellipse at 5% 68%,#76192e28,transparent 47%),radial-gradient(ellipse at 92% 37%,#4416592c,transparent 43%)}
+.ow-horizon{background:radial-gradient(ellipse at center,#ad648a17,transparent 66%);border-color:#a26f8d1c}
+.ow-agent-aura{background:radial-gradient(ellipse at 30% 40%,#b7365320,transparent 67%),radial-gradient(ellipse at 70% 40%,#9754ce20,transparent 70%)}
+.ow-agent .cyber-pet{filter:drop-shadow(-17px 10px 26px #7e183523) drop-shadow(20px -4px 28px #8141b121)}
+.ow-market-node{background:linear-gradient(135deg,#371523d4,#1e0f2488);border-color:#d59ca231;box-shadow:0 18px 60px #05000666,inset 0 1px #f9dbff0c}
+.ow-coin{background:radial-gradient(circle at 30% 20%,#e6b0c626,#a275c00e);border-color:#c48aaf38;color:#d8b1d8}
+.ow-thought{background:linear-gradient(125deg,#351421b5,#190d22cf);border-color:#bc8fa834;box-shadow:0 15px 50px #0006}
+.ow-thought-label{color:#ba99b1}.ow-thought-detail{color:#b9a0b9}.ow-thought-link{color:#d6a4d3}
+.ow-fortune{background:radial-gradient(ellipse at 45% 40%,#aa77c518,#37122e09 68%)}
+.ow-fortune-rim{background:conic-gradient(from 20deg,#cbb3ff00 20%,#b880a410 30%,#ddb0cc32 32%,#cbb3ff00 45%);border-color:#b68ba51e;box-shadow:inset 0 0 36px #c594ff08}
+.ow-guard-node{background:linear-gradient(130deg,#25152eb8,#140a1bd1);border-color:#ac82c02c}
+.ow-fill-comet{background:linear-gradient(130deg,#32141fb0,#190c20a3);border-color:#b88aa428}
+.ow-command-dock{background:linear-gradient(125deg,#351826ec,#221128f5 65%,#160c1dec);border-color:#c29ac43a;box-shadow:0 20px 75px #0009,inset 0 1px #f2d8ff13}
+.ow-command-glow{background:radial-gradient(ellipse,#ad33642a,transparent 67%)}
+.ow-popup,.simple-desk .cy-dialog,.pro-desk .cy-dialog{background:radial-gradient(ellipse at 3% 100%,#731a332a,transparent 55%),radial-gradient(ellipse at 95% 0,#5c2b7230,transparent 70%),#140b1af2;border-color:#c599bf38}
+.ow-strategy-fan>button{background:linear-gradient(145deg,#3d1a2c,#1a0e21);border-color:#c399bf35}
+.ow-strategy-fan>button:nth-child(2){background:linear-gradient(145deg,#3b2046,#201127)}
+.ow-strategy-fan>button:nth-child(3){background:linear-gradient(145deg,#481829,#200e1e)}
+.ow-strategy-fan>button.selected{border-color:#dbb0d59c}
+.pro-desk .cy-panel{background:linear-gradient(140deg,#231022b5,#100811ed);border-color:#bd91bd24}
+.pro-desk .cy-market-strip{background:linear-gradient(110deg,#29121fbd,#160d20b0);border-color:#bb92b12b}
+.pro-desk .cy-agent-controls{background:linear-gradient(120deg,#35162b9a,#1c1024b0);border-color:#b68bad2d}
+.archive-shell.app-shell{background:radial-gradient(ellipse at 7% 45%,#3e102233,transparent 66%),radial-gradient(ellipse at 90% 20%,#2610353d,transparent 70%),#09050d}
+.archive-shell .app-atmosphere i:first-child{background:conic-gradient(from 12deg,transparent 0 21%,#79233e45 28%,#a269ae60 37%,transparent 46% 66%,#55267555 79%,transparent 92%)}
+.archive-shell .app-atmosphere i:nth-child(2){background:conic-gradient(from 100deg,transparent 0 20%,#8c30454c 31%,transparent 44%,#4822645a 71%,transparent 85%)}
+.archive-shell .app-atmosphere i:nth-child(3){background:radial-gradient(circle,#9b365426, #5e2f7715 35%,transparent 65%)}
+.workspace-archive-banner{background:linear-gradient(125deg,#33122624,#2a143321);border-color:#aa7c9d35}
+.workspace-more>div{background:linear-gradient(140deg,#2b1223f5,#140b1bf8);border-color:#ac7c9f44}
+.cy-data-help{position:relative;display:inline-grid;place-items:center;font:9px sans-serif;width:14px;height:14px;border:1px solid #ba96ca45;border-radius:50%;color:#b497c2;cursor:help;margin-left:5px;outline-offset:3px}
+.cy-data-tooltip{position:absolute;bottom:calc(100% + 9px);right:-12px;width:210px;padding:12px;border:1px solid #bc8eae45;border-radius:13px 18px 13px 18px;background:#211024f5;backdrop-filter:blur(20px);font-size:10px;line-height:1.65;font-weight:400;color:#d4bbdc;letter-spacing:0;white-space:normal;text-transform:none;box-shadow:0 12px 35px #0008;z-index:50;display:none}
+.cy-data-help:hover .cy-data-tooltip,.cy-data-help:focus .cy-data-tooltip{display:block;animation:ow-popup-enter .2s ease-out both}
+@keyframes dark-spider-drift{from{transform:translateX(-3%);opacity:.65}to{transform:translateX(4%);opacity:1}}
+.motion-off .cy-atmosphere:after{animation:none}
+@media(prefers-reduced-motion:reduce){.cy-atmosphere:after{animation:none}}
+.cy-depth,.cy-depth .cy-panel-head{overflow:visible}
+.landing{position:relative;overflow:hidden}

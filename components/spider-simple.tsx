@@ -11,7 +11,7 @@ import {normalizedSeries} from '../lib/spider/cockpit';
 const num = (n: number, digits = 2) => new Intl.NumberFormat('en-US', {maximumFractionDigits: digits}).format(n);
 type Props = {
   bot: BotView | null; metrics: BotStats | null; snapshot: Snapshot | null; market?: Market; markets: Market[];
-  fresh: boolean; observing: boolean; busy: boolean; loading: boolean; disabled: boolean; motion: boolean;
+  fresh: boolean; feedUnavailable: boolean; observing: boolean; busy: boolean; loading: boolean; disabled: boolean; motion: boolean;
   capital: string; mandate: MandateId | null; settingsError: string;
   onCapital: (value: string) => void; onMandate: (id: MandateId) => void; onMarket: (market: Market) => void;
   onMarkets: () => void; onStart: () => void; onCommand: (action: 'pause'|'resume'|'close') => void;
@@ -45,8 +45,9 @@ export default function SpiderSimple(p: Props) {
   const quote=p.market?.quote??'USDT',base=p.market?.base??'BTC',positive=(metrics?.netPnl??0)>=0;
   const planId=bot?.config.mandate??p.mandate,plan=planId?MANDATES[planId]:null;
   const inPosition=!!bot?.quantity,running=bot?.status==='running';
-  const title=!fresh?C.offline:!bot?C.ready:!running?C.paused:lastCycle?C.fill[lastCycle.action]:C.observe;
-  const detail=!fresh?C.offlineDetail:!bot?C.readyDetail:!running?inPosition?C.pausedOpen:C.pausedFlat:lastCycle?C.reason[lastCycle.reason]:C.noRecord;
+  const connecting=!snapshot&&!p.feedUnavailable;
+  const title=connecting?C.connecting:!fresh?C.offline:!bot?C.ready:!running?C.paused:lastCycle?C.fill[lastCycle.action]:C.observe;
+  const detail=connecting?C.connectingDetail:!fresh?C.offlineDetail:!bot?C.readyDetail:!running?inPosition?C.pausedOpen:C.pausedFlat:lastCycle?C.reason[lastCycle.reason]:C.noRecord;
   const label=p.busy?C.pending:!bot?C.start:running?inPosition?C.close:C.pause:C.resume;
   const onAction=()=>!bot?p.onStart():p.onCommand(running?inPosition?'close':'pause':'resume');
   const disabled=p.disabled||(running&&inPosition&&!fresh),lastFill=bot?.trades.at(-1);
@@ -54,12 +55,12 @@ export default function SpiderSimple(p: Props) {
   const candles=snapshot?.candles.slice(-100)??[],path=normalizedSeries(candles.map(c=>c.close),1000,220);
   function parallax(event:React.PointerEvent<HTMLDivElement>){if(!motion||event.pointerType==='touch')return;const b=event.currentTarget.getBoundingClientRect();event.currentTarget.style.setProperty('--look-x',`${(event.clientX-b.left-b.width/2)/b.width*12}px`);event.currentTarget.style.setProperty('--look-y',`${(event.clientY-b.top-b.height/2)/b.height*8}px`);}
   return <section className={`orbit-workspace ${running&&fresh?'agent-running':''}`}>
-    <header className="ow-intro"><div><span>{C.eyebrow}</span><h2>{C.title}</h2></div><span className={`ow-live ${fresh?'online':''}`}><i/>{fresh?C.live:C.stale}<small>{C.virtual}</small></span></header>
+    <header className="ow-intro"><div><span>{C.eyebrow}</span><h2>{C.title}</h2></div><span className={`ow-live ${fresh?'online':''}`}><i/>{connecting?C.connecting:fresh?C.live:C.stale}<small>{C.virtual}</small></span></header>
     <div ref={worldRef} className={`ow-world phase-${running&&fresh?stage:0}`} onPointerMove={parallax} onPointerLeave={()=>{worldRef.current?.style.setProperty('--look-x','0px');worldRef.current?.style.setProperty('--look-y','0px');}}>
       <div className="ow-nebula" aria-hidden="true"/><div className="ow-horizon" aria-hidden="true"/>
       <svg fill="none" className="ow-orbits" viewBox="0 0 1200 550" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="ow-orbit-light"><stop stopColor="#c193ff" stopOpacity="0"/><stop offset=".4" stopColor="#c193ff" stopOpacity=".4"/><stop offset="1" stopColor="#a09aff" stopOpacity="0"/></linearGradient></defs><ellipse cx="600" cy="300" rx="420" ry="155" stroke="url(#ow-orbit-light)"/><ellipse cx="600" cy="300" rx="330" ry="205" stroke="#b89aff0c" transform="rotate(-16 600 300)"/><path className="ow-wire" d="M170 170Q365 60 585 268T1015 205" stroke="#bb93ff36" strokeDasharray="2 8"/><path className="ow-wire" d="M255 370Q360 470 600 315T960 90" stroke="#9c8bff24" strokeDasharray="2 8"/></svg>
       <button className={`ow-market-node ${p.observing?'receiving':''}`} onClick={p.onMarkets} disabled={p.busy||p.loading}><span className="ow-coin">{base==='BTC'?'₿':base==='ETH'?'Ξ':base.slice(0,1)}</span><span><small>{p.market?.venue??'Binance'} / {C.marketUpdated}</small><b>{base} <em>/ {quote}</em><ChevronDown size={12}/></b><strong>{snapshot?<AnimatedNumber value={snapshot.price} animate={motion} format={v=>num(v,snapshot.price<1?8:2)}/>:'—'}</strong></span><i className={(snapshot?.change24h??0)>=0?'positive':'negative'}>{snapshot?.change24h==null?'—':`${snapshot.change24h>=0?'+':''}${snapshot.change24h.toFixed(2)}%`}<small>24H</small></i></button>
-      <button className="ow-fortune" onClick={()=>setPopup('wallet')} aria-label={C.walletOpen}><div className="ow-fortune-rim"/><span>{bot?C.account:C.preview}<small>{quote}</small></span><strong><AnimatedNumber value={metrics?.equity??(Number(p.capital)||0)} animate={motion} format={v=>num(v)}/></strong><b className={metrics?positive?'positive':'negative':''}>{metrics?`${metrics.netPnl>=0?'+':''}${num(metrics.netPnl)}`:'—'} <small>{metrics?`${metrics.returnPercent>=0?'+':''}${metrics.returnPercent.toFixed(2)}%`:C.profit}</small></b><em>{C.afterCosts}</em><ArrowUpRight size={15}/></button>
+      <button className="ow-fortune" onClick={()=>setPopup('wallet')} aria-label={C.walletOpen}><div className="ow-fortune-rim"/><span>{bot?C.account:C.preview}<small>{quote}</small></span><strong><AnimatedNumber key={bot?.id??'draft'} value={metrics?.equity??(Number(p.capital)||0)} animate={motion} format={v=>num(v)}/></strong><b className={metrics?positive?'positive':'negative':''}>{metrics?`${metrics.netPnl>=0?'+':''}${num(metrics.netPnl)}`:'—'} <small>{metrics?`${metrics.returnPercent>=0?'+':''}${metrics.returnPercent.toFixed(2)}%`:C.profit}</small></b><em>{C.afterCosts}</em><ArrowUpRight size={15}/></button>
       <button className="ow-guard-node" onClick={()=>p.onPanel('setup')}><ShieldCheck size={15}/><span>{C.guardNode}<small>{C.guardLabel}</small></span><i/></button>
       <div className="ow-agent"><div className="ow-agent-aura"/><CyberSpider active={running&&fresh} stage={stage}/><span className="ow-agent-name">SPIDER <small>/ 01</small><i className={running&&fresh?'awake':''}/></span></div>
       <button className="ow-thought" disabled={!lastCycle} onClick={()=>p.onPanel('evidence')}><span className="ow-thought-label"><i/>{lastCycle?`${C.liveCheck} · ${new Date(lastCycle.time).toLocaleTimeString('en-GB',{timeZone:'UTC'})+' UTC'}`:C.rule}</span><strong>{title}</strong><span className="ow-thought-detail">{detail}</span>{lastCycle&&<span className="ow-thought-link">{C.evidence}<ArrowUpRight size={11}/></span>}</button>

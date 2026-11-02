@@ -10,7 +10,13 @@ test('app routes preserve feed and track options while recording each navigable 
   assert.deepEqual(readAppRoute(spider.slice(4)), {view: 'spider', configure: false, track: 'advanced'});
   const setup = appRoute(spider.slice(4), 'train', true);
   assert.equal(readAppRoute(setup.slice(4)).configure, true);
-  assert.equal(readAppRoute('?view=not-a-page').view, 'train');
+  assert.equal(readAppRoute('?view=not-a-page').view, 'spider');
+});
+test('the default workspace opens the agent while explicit archive links remain addressable',()=>{
+  assert.equal(readAppRoute('').view,'spider');
+  assert.equal(readAppRoute('?track=advanced').view,'spider');
+  assert.equal(readAppRoute('?view=train').view,'train');
+  assert.equal(readAppRoute('?view=review').view,'review');
 });
 test('a control waits for an in-flight tick, uses its new version and recovers after a rejected operation', async () => {
   const queue = new SpiderQueue(), events: string[] = []; let release!: () => void, version = 0;

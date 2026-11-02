@@ -20,5 +20,5 @@ export const ACCOUNT_COPY = {
   empty: 'No visits recorded yet.',
   back: 'Back to site',
   refresh: 'Refresh',
-  pagesByName: {home:'Home',training:'Training',market:'Market lab',review:'Review',progress:'Progress'},
+  pagesByName: {home:'Home',spider:'Agent',training:'Training',market:'Market lab',review:'Review',progress:'Progress'},
 } as const;

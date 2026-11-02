@@ -1,13 +1,14 @@
 'use client';
 import {useEffect} from 'react';
+import {readAppRoute} from '../lib/app-navigation';
 import {usePathname} from 'next/navigation';
 
-const pages=new Set(['training','market','review','progress']);
+const pages=new Set(['training','market','review','progress','spider']);
 function pageForPath(pathname:string){
   if(pathname==='/')return 'home';
   if(pathname==='/app'){
-    const view=new URLSearchParams(window.location.search).get('view');
-    return view&&pages.has(view)?view:'training';
+    const view=readAppRoute(window.location.search).view;
+    return view==='train'?'training':view;
   }
   return null;
 }

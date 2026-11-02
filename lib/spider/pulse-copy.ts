@@ -4,7 +4,7 @@ export const PULSE = {
   cadence: 'Evaluate every', chartCadence: 'Chart candles', cooldown: 'Signal fill cooldown',
   fee: 'Fee per fill (bps)', slippage: 'Adverse slippage (bps)',
   costNote: 'Paper assumptions. Use your actual account fee tier; 1 bp = 0.01%. A 5-second check does not force an order.',
-  cadenceNote: 'Tape pulse reads sampled quotes without waiting for a candle close. Candle strategies keep their closed-bar entry rules. Protective exits bypass the cooldown.',
+  cadenceNote: 'Book pulse reads sampled quotes without waiting for a candle close. Candle strategies keep their closed-bar entry rules. Protective exits bypass the cooldown.',
   coinbase: 'Coinbase market feed awaits permissions', coinbaseNote: 'This preview uses the selected exchange’s real quotes with virtual funds. Coinbase remains disabled until the required permissions are configured.',
   checks: 'Completed checks', evaluations: 'Strategy evaluations', next: 'Next evaluation', scanning: 'Waiting for a fresh check', paused: 'Paused', preview: 'Start a spider to record its decision loop',
   strength: 'Observed move / entry hurdle',

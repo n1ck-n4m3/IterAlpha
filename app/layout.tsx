@@ -6,6 +6,7 @@ import "./experience.css";
 import "./learning.css";
 import "./cockpit.css";
 import "./orbit.css";
+import "./dark-spider.css";
 import VisitTracker from '../components/visit-tracker';
 import InteractionEffects from '../components/interaction-effects';
 import {LocaleProvider} from '../components/locale-provider';
