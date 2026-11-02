@@ -1,3 +1,4 @@
+import type {MandateId} from './mandates.ts';
 import type {Candle} from '../training/types.ts';
 import type {ExchangeId} from '../exchanges/types.ts';
 
@@ -24,7 +25,7 @@ export type Reason = 'trend-entry' | 'trend-exit' | 'reversion-entry' | 'reversi
   'stale' | 'feed-unavailable' | 'gap' | 'paused' | 'resumed' | 'started' |
   'tape-entry' | 'tape-exit' | 'tape-warming' | 'tape-waiting' | 'cost-gate' | 'cooldown' | 'bar-wait' | 'cadence-wait';
 export type Signal = {action: 'buy' | 'sell' | 'hold'; reason: Reason; bar: number; indicators: {fast: number | null; slow: number | null; rsi: number | null; macd: number | null; breakout: number | null}};
-export type Config = {feedMode?: 'server' | 'browser'; market: Market; strategy: Strategy; interval: Interval; initialCash: number; allocationPercent: number; stopPercent: number; targetPercent: number;
+export type Config = {mandate?: MandateId; feedMode?: 'server' | 'browser'; market: Market; strategy: Strategy; interval: Interval; initialCash: number; allocationPercent: number; stopPercent: number; targetPercent: number;
   evaluationSeconds?: EvaluationSeconds; cooldownSeconds?: number; feeBps?: number; slippageBps?: number};
 export type Trade = {id: string; side: 'buy' | 'sell'; time: number; quantity: number; price: number; fee: number; notional: number; reason: Reason; netPnl: number | null};
 export type Event = {time: number; reason: Reason; action: 'buy' | 'sell' | 'hold' | 'pause' | 'resume'};

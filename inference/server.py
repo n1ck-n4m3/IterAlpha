@@ -23,7 +23,7 @@ class Option(BaseModel):
 
 class Row(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    id: Literal["support", "focus"]
+    id: Literal["support", "focus", "setup", "quality"]
     question: str = Field(min_length=1, max_length=1000)
     options: list[Option] = Field(min_length=2, max_length=6)
     state: dict
@@ -31,7 +31,7 @@ class Row(BaseModel):
 
 class Batch(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    version: Literal["iteralpha-decider-v1"]
+    version: Literal["iteralpha-decider-v1", "iteralpha-trading-judge-v1"]
     rows: list[Row] = Field(min_length=2, max_length=2)
 
 
@@ -89,12 +89,12 @@ def score_batch(batch: Batch):
     for row in batch.rows:
         result = score(runtime["model"], runtime["tokenizer"], row.model_dump(), {"model_source": MODEL, "model_revision": REVISION}, max_tokens=1536)
         results.append({"id": row.id, "option_ids": result["option_ids"], "scores": result["probabilities"], "prompt_sha256": result["prompt_sha256"]})
-    return {"version": "iteralpha-decider-v1", "model": MODEL, "revision": REVISION, "quantization": "nf4", "results": results}
+    return {"version": batch.version, "model": MODEL, "revision": REVISION, "quantization": "nf4", "results": results}
 
 
 @app.post("/v1/decide")
 async def decide(batch: Batch):
-    if {row.id for row in batch.rows} != {"support", "focus"}:
+    if batch.version != "iteralpha-decider-v1" or {row.id for row in batch.rows} != {"support", "focus"}:
         raise HTTPException(422, "Both decision questions are required.")
     if lock.locked():
         raise HTTPException(503, "The model is busy. Retry later.")
@@ -103,4 +103,17 @@ async def decide(batch: Batch):
             return await asyncio.to_thread(score_batch, batch)
         except (ValueError, RuntimeError):
             # Avoid reflecting prompts, credentials, or provider stack traces.
+            raise HTTPException(503, "The model could not score this bounded request.") from None
+
+
+@app.post("/v1/trading/assess")
+async def assess_trading(batch: Batch):
+    if batch.version != "iteralpha-trading-judge-v1" or {row.id for row in batch.rows} != {"setup", "quality"}:
+        raise HTTPException(422, "Both trading review questions are required.")
+    if lock.locked():
+        raise HTTPException(503, "The model is busy. Retry later.")
+    async with lock:
+        try:
+            return await asyncio.to_thread(score_batch, batch)
+        except (ValueError, RuntimeError):
             raise HTTPException(503, "The model could not score this bounded request.") from None

@@ -158,3 +158,12 @@ test('each new decision check preserves observed input and distinguishes a propo
   const wide = snapshot(); wide.ask = wide.bid * 1.01; wide.asks[0].price = wide.ask;
   const blocked = advanceBot(bot, wide, now + 5000).cycles!.at(-1)!; assert.equal(blocked.evidence?.proposedAction, 'buy'); assert.equal(blocked.action, 'hold'); assert.equal(blocked.reason, 'spread');
 });
+
+test('server rejects a misleading mandate and preserves validated mandate metadata', async () => {
+  const db=database(),body={requestId:crypto.randomUUID(),feedMode:'browser',mandate:'fast',browserSnapshot:{...snapshot(Date.now()),source:'Binance Spot public market data'},marketId:market.id,strategy:'tape',interval:60,initialCash:10000,allocationPercent:20,stopPercent:.3,targetPercent:.6,evaluationSeconds:5,cooldownSeconds:15,feeBps:10,slippageBps:5};
+  const send=(value:unknown)=>handleApi(new Request('https://test.example/api/spiders',{method:'POST',headers:{'content-type':'application/json','x-iteralpha-request':'1',origin:'https://test.example',cookie:`iteralpha_guest=${'2'.repeat(64)}`},body:JSON.stringify(value)}),{DB:db});
+  assert.equal((await send({...body,allocationPercent:50})).status,400);
+  const accepted=await send(body);assert.equal(accepted.status,200);const bot=await accepted.json() as any;assert.equal(bot.config.mandate,'fast');
+  assert.equal((await send({...body,mandate:undefined})).status,409);
+  const capabilities=await handleApi(new Request('https://test.example/api/spider/capabilities'),{DB:db});assert.equal(capabilities.status,200);assert.equal((await capabilities.json() as any).model,'not-connected');
+});

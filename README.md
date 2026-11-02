@@ -1,6 +1,6 @@
 # IterAlpha
 
-IterAlpha is an open-source crypto spot research and paper-trading workspace with a trading judgment trainer. The Crypto GTO research direction tests whether bounded strategies have an advantage after costs; it does not implement a proven market equilibrium, place real trades, or promise investment performance. Coinbase Advanced is the first planned execution target, with separate adapters planned for other venues.
+IterAlpha is an open-source crypto agent workspace: choose a high-level strategy, delegate paper orders, and inspect net performance on real market quotes. Simple and Pro share one account; a trading judgment trainer remains available as a secondary tool. The Crypto GTO research direction tests whether bounded strategies have an advantage after costs; it does not implement a proven market equilibrium, place real trades, or promise investment performance. Coinbase Advanced is the first planned execution target, with separate adapters planned for other venues.
 
 The Spider workspace at `/app?view=spider` reads public Binance spot data, runs candle-based rules or an experimental short-window Tape pulse strategy with virtual funds, and saves paper decisions and fills. Where hosting cannot reach the public feed, a labeled browser connection supplies unverified prices for personal practice. Coinbase data remains permission-gated. No authenticated exchange order adapter or running open model is connected. The exchange inventory distinguishes implemented feeds from future integrations. Tape pulse can evaluate sampled quotes every 5 seconds without waiting for a candle close. A decision radar shows actual checks, cost hurdles, actions, and price/equity histories. See [the fast-spider guide](docs/FAST-SPIDER.md) for defaults and limitations; five-second evaluation does not require a fill every five seconds.
 
@@ -10,7 +10,9 @@ Spider controls now serialize ledger updates, reconcile version conflicts, and e
 
 The Spider interface is now a visual cyber cockpit: a live chart, animated four-stage spider arena, position ring, changing depth bars, and a seekable recorded-check replay. Full settings and evidence remain available in drawers. Motion controls and reduced-motion preferences are supported. The animation is a visualization of recorded checks, not a claim of an active AI model. See [the cockpit guide](docs/CYBER-COCKPIT.md).
 
-The homepage at `/` introduces two paths and includes an interactive decision preview and an opt-in early-access form. A visible Home link returns there from the training room at `/app`. The training room contains fresh generated BTC/ETH scenarios, a synthetic market lab, a decision journal, and progress history. The Foundations path adds a short beginner tutorial; Advanced Practice shows facts and uncertainty first. Reasons are optional taps, not writing assignments.
+The homepage at `/` introduces Simple and Pro, with an explicitly illustrative agent workflow and an opt-in early-access form. Simple uses a scene with a mechanical spider, orbiting market and wallet nodes, decision bubbles, and a floating strategy dock; charts and strategy details expand on demand. Pro keeps the detailed terminal. See [the current product and model plan](docs/AGENT-PLATFORM-PLAN.md) for the GitHub comparison, 5060 deployment assumptions, and API/training contracts. A visible Home link returns there from the training room at `/app`. The training room contains fresh generated BTC/ETH scenarios, a synthetic market lab, a decision journal, and progress history. The Foundations path adds a short beginner tutorial; Advanced Practice shows facts and uncertainty first. Reasons are optional taps, not writing assignments.
+
+The default agent entry is `/app?view=spider&mode=easy`; use `mode=pro` for the terminal. Three validated high-level mandates map to explicit sizing and timing parameters. The optional trading judge API adapter is shadow-only and cannot alter orders; no inference is connected to the public execution loop. Training has a validated job contract and adapter boundary, not a running training service.
 
 ## What works today
 
@@ -25,7 +27,7 @@ The homepage at `/` introduces two paths and includes an interactive decision pr
 
 The site records visited sections and timestamps. Signed-in visits include the account email; guest visits use a one-way anonymous identifier. IP addresses are not stored in this log. The dashboard shows the last 30 days and older entries are pruned as new visits arrive. Multiple visits by one visitor to the same section within 15 minutes count once.
 
-Synthetic practice paths are **not historical replays**. Each checkpoint separates visible price, range, and volume calculations from teaching interpretations and unknowns. The homepage preview is illustrative and does not save a trade. The training snapshot adapter and gated Coinbase adapter do not supply training scenes; Spider uses a separate public feed. Using historical data requires suitable usage rights and reviewed provenance. No brokerage account is connected.
+Synthetic practice paths are **not historical replays**. Each checkpoint separates visible price, range, and volume calculations from teaching interpretations and unknowns. The homepage workflow is illustrative and does not show live orders or performance. The training snapshot adapter and gated Coinbase adapter do not supply training scenes; Spider uses a separate public feed. Using historical data requires suitable usage rights and reviewed provenance. No brokerage account is connected.
 
 ## Run locally
 

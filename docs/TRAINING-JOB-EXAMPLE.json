@@ -1,0 +1,26 @@
+{
+  "version": "iteralpha-training-job-v1",
+  "jobId": "paper-labels-v1",
+  "method": "calibration",
+  "baseModel": "Qwen/Qwen3.5-4B",
+  "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "dataset": {
+    "uri": "file:///datasets/owner-approved-labels.jsonl",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "provenance": "Example only. Replace with the actual licensed dataset provenance and checksum.",
+    "rightsConfirmed": true,
+    "trainEnd": "2026-01-01T00:00:00Z",
+    "validationStart": "2026-01-02T00:00:00Z",
+    "validationEnd": "2026-02-01T00:00:00Z",
+    "testStart": "2026-02-02T00:00:00Z",
+    "testEnd": "2026-03-01T00:00:00Z",
+    "purgeSeconds": 3600,
+    "labelHorizonSeconds": 3600
+  },
+  "evaluation": {
+    "feeBps": 10,
+    "slippageBps": 5,
+    "baselines": ["cash", "buy-and-hold", "rule-strategy"],
+    "walkForward": true
+  }
+}

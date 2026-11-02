@@ -41,7 +41,7 @@ export const COCKPIT = {
   safe: 'Spot · long only', unverified: 'BROWSER FEED · UNVERIFIED', serverFeed: 'SERVER FEED', pausedExposure: 'POSITION OPEN · EXITS PAUSED',
   flat: 'FLAT', cash: 'Cash', invested: 'Spot value', entry: 'ENTRY', stopPrice: 'STOP', targetPrice: 'TARGET', mark: 'BID',
   bid: 'BID', ask: 'ASK', buySide: 'BUY DEPTH', sellSide: 'SELL DEPTH', spread: 'SPREAD',
-  emptyWin: 'No completed trades', sample: 'closed trades', launchHint: '5-second evaluation · orders only when rules pass',
+  emptyWin: 'No completed trades', sample: 'closed trades', launchHint: 'Live checks · orders only when rules pass',
   closePanel: 'Close panel', search: 'Search active spot pairs', all: 'All venues', pair: 'PAIR', source: 'SOURCE',
   latest: 'Latest', export: 'Export', exportFills: 'Export fills', exportChecks: 'Export checks', advanced: 'Execution settings', strategyDetail: 'Strategy details',
   strategyNames: {tape: 'Tape pulse', trend: 'Trend rider', reversion: 'Range scout', breakout: 'Breakout hunter'},

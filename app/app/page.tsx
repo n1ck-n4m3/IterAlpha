@@ -9,5 +9,5 @@ export default async function AppPage({searchParams}: {searchParams: Promise<Rec
   const user=await getChatGPTUser();
   const params=await searchParams, candidate=params.view;
   const initialView=readAppRoute(new URLSearchParams(typeof candidate==='string'?{view:candidate}:{}).toString()).view;
-  return <TrainingApp initialView={initialView} viewer={user?{name:user.displayName,isAdmin:isSiteAdmin(user,env as {ITERALPHA_ADMIN_USER_ID?:string;ITERALPHA_ADMIN_EMAIL?:string})}:null}/>;
+  return <TrainingApp initialSpiderMode={params.mode==='pro'?'pro':'easy'} initialView={initialView} viewer={user?{name:user.displayName,isAdmin:isSiteAdmin(user,env as {ITERALPHA_ADMIN_USER_ID?:string;ITERALPHA_ADMIN_EMAIL?:string})}:null}/>;
 }
