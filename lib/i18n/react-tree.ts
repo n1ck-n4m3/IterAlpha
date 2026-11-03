@@ -4,7 +4,6 @@ import {localizeText} from './text.ts';
 const attributes=['aria-label','aria-description','aria-valuetext','title','placeholder','alt'] as const;
 /** Keep handlers, values, IDs and exported data untouched; translate React display nodes before rendering. */
 export function localizeTree(node:ReactNode,locale:Locale):ReactNode {
-  if(locale==='en')return node;
   if(typeof node==='string')return localizeText(locale,node);
   if(Array.isArray(node))return Children.map(node,child=>localizeTree(child,locale));
   if(!isValidElement(node))return node;

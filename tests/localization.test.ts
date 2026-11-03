@@ -15,10 +15,12 @@ test('locale rendering translates display and accessibility copy without changin
   const onClick=()=>{},node=createElement('button',{'aria-label':'Start agent',value:'running',onClick},'Start agent');
   const translated=localizeTree(node,'zh-CN') as ReactElement<any>;
   assert.equal(translated.props.children,'启动智能体');assert.equal(translated.props['aria-label'],'启动智能体');assert.equal(translated.props.value,'running');assert.equal(translated.props.onClick,onClick);
-  assert.equal(localizeTree(node,'en'),node);
+  const original=localizeTree(node,'en') as ReactElement<any>;
+  assert.equal(original.props.children,'Start agent');assert.equal(original.props.onClick,onClick);
   const option=localizeTree(createElement('option',{value:'tape'},'Book pulse'),'zh-CN') as ReactElement<any>;assert.equal(option.props.value,'tape');assert.equal(option.props.children,'盘口脉冲');
   const siblings=localizeTree([node,createElement('span',null,'Home')],'zh-CN') as ReactElement[];
   assert(siblings.every(child=>child.key!==null));assert.equal((siblings[0].props as any).onClick,onClick);
+  for(const locale of LOCALES){const next=localizeTree([node,createElement('span',null,'Home')],locale) as ReactElement[];assert.deepEqual(next.map(child=>child.key),siblings.map(child=>child.key));}
 });
 test('stored notes and exported code remain original while surrounding labels are localized',()=>{
   const note=localizeTree(createElement('span',{'data-i18n':'source',title:'Home'},'Home'),'zh-CN') as ReactElement<any>;
