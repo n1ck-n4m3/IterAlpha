@@ -1,4 +1,10 @@
 'use client';
+import LocalizedContent from './localized-content';
+
+
+
+import {useLocale} from './locale-provider';
+import {localizeText} from '../lib/i18n/text';
 import {useEffect, useRef, useState} from 'react';
 import type {IChartApi, ISeriesApi, Time, SeriesType, SeriesMarker} from 'lightweight-charts';
 import type {Candle} from '../lib/training/types';
@@ -11,6 +17,7 @@ type Indicators = {ma: boolean; ema: boolean; bands: boolean; volume: boolean; m
 const INITIAL: Indicators = {ma: true, ema: false, bands: false, volume: true, macd: true, rsi: false};
 type Bundle = {chart: IChartApi; price: ISeriesApi<SeriesType>; lines: Record<string, ISeriesApi<'Line'>>; volume?: ISeriesApi<'Histogram'>; histogram?: ISeriesApi<'Histogram'>; markers: {setMarkers: (m: SeriesMarker<Time>[]) => void}};
 export default function SpiderChart({snapshot, trades, stop, target = null, entry = null, compact = false, motion = true}: {snapshot: Snapshot; trades: Trade[]; stop: number | null; target?: number | null; entry?: number | null; compact?: boolean; motion?: boolean}) {
+  const {locale}=useLocale();
   const lastBar = useRef<Candle | null>(null);
   const container = useRef<HTMLDivElement>(null), bundle = useRef<Bundle | null>(null);
   const [style, setStyle] = useState<ChartStyle>('candles'), [indicators, setIndicators] = useState(INITIAL), [ready, setReady] = useState(0), [failed, setFailed] = useState(false);
@@ -20,7 +27,7 @@ export default function SpiderChart({snapshot, trades, stop, target = null, entr
     void import('lightweight-charts').then(L => {
       if (disposed || !container.current) return;
       const chart = L.createChart(container.current, {autoSize: true, height: compact ? Math.max(240, container.current.clientHeight) : 520,
-        layout: {background: {type: L.ColorType.Solid, color: compact ? '#0b0b17' : '#100b1a'}, textColor: '#af9fc2', fontFamily: 'Inter, sans-serif', attributionLogo: true},
+        localization:{locale}, layout: {background: {type: L.ColorType.Solid, color: compact ? '#0b0b17' : '#100b1a'}, textColor: '#af9fc2', fontFamily: 'Inter, sans-serif', attributionLogo: true},
         grid: {vertLines: {color: '#a48bb610'}, horzLines: {color: '#a48bb619'}}, crosshair: {mode: L.CrosshairMode.Normal},
         rightPriceScale: {borderColor: '#b99bd22a'}, timeScale: {borderColor: '#b99bd22a', timeVisible: true, secondsVisible: false},
       });
@@ -50,7 +57,7 @@ export default function SpiderChart({snapshot, trades, stop, target = null, entr
     return () => {disposed = true; bundle.current?.chart.remove(); bundle.current = null; lastBar.current = null;};
     // Chart configuration is rebuilt only when the market, style, or indicators change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [identity, style, indicators, compact]);
+  }, [identity, style, indicators, compact,locale]);
   useEffect(() => {
     const b = bundle.current; if (!b) return;
     const candles = snapshot.candles, displayed = style === 'heikin' ? heikinAshi(candles) : candles;
@@ -62,7 +69,7 @@ export default function SpiderChart({snapshot, trades, stop, target = null, entr
     for (const [key, line] of Object.entries(b.lines)) line.setData(series[key].flatMap((value, i) => value === null ? [] : [{time: candles[i].time as Time, value}]));
     b.volume?.setData(candles.map(c => ({time: c.time as Time, value: c.volume ?? 0, color: c.close >= c.open ? '#6aebc070' : '#fa8ba470'})));
     b.histogram?.setData(momentum.histogram.flatMap((value, i) => value === null ? [] : [{time: candles[i].time as Time, value, color: value >= 0 ? '#6aebc090' : '#fa8ba490'}]));
-    b.markers.setMarkers(trades.filter(t => t.time / 1000 >= candles[0].time).map(t => ({time: (Math.floor(t.time / 1000 / snapshot.interval) * snapshot.interval) as Time, position: t.side === 'buy' ? 'belowBar' : 'aboveBar', color: t.side === 'buy' ? '#6aebc0' : '#fa8ba4', shape: t.side === 'buy' ? 'arrowUp' : 'arrowDown', text: t.side === 'buy' ? 'BUY' : 'SELL'})));
+    b.markers.setMarkers(trades.filter(t => t.time / 1000 >= candles[0].time).map(t => ({time: (Math.floor(t.time / 1000 / snapshot.interval) * snapshot.interval) as Time, position: t.side === 'buy' ? 'belowBar' : 'aboveBar', color: t.side === 'buy' ? '#6aebc0' : '#fa8ba4', shape: t.side === 'buy' ? 'arrowUp' : 'arrowDown', text: localizeText(locale,t.side === 'buy' ? 'BUY' : 'SELL')})));
     const targetBar = displayed.at(-1)!;
     const prior = lastBar.current; lastBar.current = targetBar;
     let animation = 0;
@@ -78,11 +85,11 @@ export default function SpiderChart({snapshot, trades, stop, target = null, entr
       };
       animation = requestAnimationFrame(animate);
     }
-    const stopLine = stop && style !== 'heikin' ? b.price.createPriceLine({price: stop, color: '#ffaf7e', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'STOP'}) : null;
-    const targetLine = target && style !== 'heikin' ? b.price.createPriceLine({price: target, color: '#65e5b3', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: C.target}) : null;
-    const entryLine = entry && style !== 'heikin' ? b.price.createPriceLine({price: entry, color: '#b699ff', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: C.entry}) : null;
+    const stopLine = stop && style !== 'heikin' ? b.price.createPriceLine({price: stop, color: '#ffaf7e', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: localizeText(locale,'STOP')}) : null;
+    const targetLine = target && style !== 'heikin' ? b.price.createPriceLine({price: target, color: '#65e5b3', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: localizeText(locale,C.target)}) : null;
+    const entryLine = entry && style !== 'heikin' ? b.price.createPriceLine({price: entry, color: '#b699ff', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: localizeText(locale,C.entry)}) : null;
     return () => {cancelAnimationFrame(animation); if (bundle.current === b) for (const line of [stopLine, targetLine, entryLine]) if (line) b.price.removePriceLine(line);};
-  }, [snapshot, trades, stop, target, entry, ready, style, motion]);
+  }, [snapshot, trades, stop, target, entry, ready, style, motion,locale]);
   useEffect(() => {bundle.current?.chart.timeScale().fitContent();}, [ready]);
-  return <><div className="sp-chart-controls"><select aria-label="Chart style" value={style} onChange={e => setStyle(e.target.value as ChartStyle)}>{chartStyles.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select><div>{(Object.keys(indicators) as (keyof Indicators)[]).map(key => <button type="button" aria-pressed={indicators[key]} className={indicators[key] ? 'active' : ''} key={key} onClick={() => setIndicators({...indicators, [key]: !indicators[key]})}>{C[key]}</button>)}</div><button type="button" onClick={() => bundle.current?.chart.timeScale().fitContent()}>{C.reset}</button></div><div ref={container} className="sp-interactive-chart" role="region" aria-label={C.aria}/>{failed && <p role="alert">{C.failed}</p>}<p className="sp-chart-hint">{C.hint}</p></>;
+  return <LocalizedContent>{<><div className="sp-chart-controls"><select aria-label="Chart style" value={style} onChange={e => setStyle(e.target.value as ChartStyle)}>{chartStyles.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select><div>{(Object.keys(indicators) as (keyof Indicators)[]).map(key => <button type="button" aria-pressed={indicators[key]} className={indicators[key] ? 'active' : ''} key={key} onClick={() => setIndicators({...indicators, [key]: !indicators[key]})}>{C[key]}</button>)}</div><button type="button" onClick={() => bundle.current?.chart.timeScale().fitContent()}>{C.reset}</button></div><div ref={container} className="sp-interactive-chart" role="region" aria-label={C.aria}/>{failed && <p role="alert">{C.failed}</p>}<p className="sp-chart-hint">{C.hint}</p></>}</LocalizedContent>;
 }

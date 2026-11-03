@@ -1,5 +1,5 @@
 export const WORKSPACE_COPY = {
-  agent: 'Agent', more: 'More', moreTools: 'More tools', archive: 'Practice archive', archiveDetail: 'View saved experimental rounds',
+  home:'Home',navigation:'Main navigation',agent: 'Agent', more: 'More', moreTools: 'More tools', archive: 'Practice archive', archiveDetail: 'View saved experimental rounds',
   archiveTitle: 'Archived practice experiment',
   archiveNote: 'These synthetic rounds are retained for reference. They do not measure learning progress or establish trading skill.',
   openAgent: 'Open agent', archiveEyebrow: 'SAVED EXPERIMENTS', recordsTitle: 'Your practice archive',

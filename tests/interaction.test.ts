@@ -15,7 +15,7 @@ test('app routes preserve feed and track options while recording each navigable 
 test('the default workspace opens the agent while explicit archive links remain addressable',()=>{
   assert.equal(readAppRoute('').view,'spider');
   assert.equal(readAppRoute('?track=advanced').view,'spider');
-  assert.equal(readAppRoute('?view=train').view,'train');
+  assert.equal(readAppRoute('?view=train').view,'review');
   assert.equal(readAppRoute('?view=review').view,'review');
 });
 test('a control waits for an in-flight tick, uses its new version and recovers after a rejected operation', async () => {

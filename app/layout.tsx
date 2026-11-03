@@ -10,25 +10,22 @@ import "./dark-spider.css";
 import VisitTracker from '../components/visit-tracker';
 import InteractionEffects from '../components/interaction-effects';
 import {LocaleProvider} from '../components/locale-provider';
+import LocalizedContent from '../components/localized-content';
+import {requestLocale} from '../lib/i18n/request-locale';
+import {localizeText} from '../lib/i18n/text';
 import {AudioProvider} from '../components/audio-provider';
 
-export const metadata: Metadata = {
-  title: "IterAlpha — Your strategy, in motion",
-  description: "Choose a crypto strategy. Watch your agent work. Inspect paper trading results after costs.",
-  icons: {
-    icon: "/assets/iteralpha-logo.png",
-    shortcut: "/assets/iteralpha-logo.png",
-  },
-};
+export async function generateMetadata():Promise<Metadata>{const {locale}=await requestLocale();return {title:localizeText(locale,'IterAlpha — Your strategy, in motion'),description:localizeText(locale,'Your goals and limits guide the strategy. Performance must be evaluated after costs on unseen data.'),icons:{icon:'/assets/iteralpha-logo.png',shortcut:'/assets/iteralpha-logo.png'}};}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const {locale,hasPreference}=await requestLocale();
   return (
-    <html lang="en">
-      <body className="antialiased"><LocaleProvider><AudioProvider>{children}<VisitTracker/><InteractionEffects/></AudioProvider></LocaleProvider></body>
+    <html lang={locale} dir={locale==='ar'?'rtl':'ltr'}>
+      <body className="antialiased"><LocaleProvider initialLocale={locale} hasPreference={hasPreference}><AudioProvider><LocalizedContent>{children}</LocalizedContent><VisitTracker/><InteractionEffects/></AudioProvider></LocaleProvider></body>
     </html>
   );
 }

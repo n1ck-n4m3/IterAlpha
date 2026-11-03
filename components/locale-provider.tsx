@@ -1,15 +1,16 @@
 'use client';
 import {createContext,useCallback,useContext,useEffect,useMemo,useRef,useState} from 'react';
+import {localizeText} from '../lib/i18n/text';
 import {LOCALES,localeNames,resolveLocale,translate,type Locale,type TranslationKey} from '../lib/locale-copy';
 
 type LocaleContextValue={locale:Locale;setLocale:(value:Locale)=>void;t:(key:TranslationKey)=>string};
 const LocaleContext=createContext<LocaleContextValue|null>(null);
 
-export function LocaleProvider({children}:{children:React.ReactNode}){
-  const [locale,setLocale]=useState<Locale>('en');
+export function LocaleProvider({children,initialLocale='en',hasPreference=false}:{children:React.ReactNode;initialLocale?:Locale;hasPreference?:boolean}){
+  const [locale,setLocale]=useState<Locale>(initialLocale);
   const pending=useRef<number|null>(null);
-  useEffect(()=>{let saved:string|null=null;try{saved=localStorage.getItem('iteralpha_locale');}catch{}const next=resolveLocale(saved??navigator.language);pending.current=requestAnimationFrame(()=>{setLocale(next);pending.current=null;});return()=>{if(pending.current!==null)cancelAnimationFrame(pending.current);};},[]);
-  useEffect(()=>{document.documentElement.lang=locale;document.documentElement.dir=locale==='ar'?'rtl':'ltr';try{localStorage.setItem('iteralpha_locale',locale);}catch{}},[locale]);
+  useEffect(()=>{let saved:string|null=null;try{saved=localStorage.getItem('iteralpha_locale');}catch{}const next=hasPreference?initialLocale:resolveLocale(saved??navigator.language);pending.current=requestAnimationFrame(()=>{setLocale(next);pending.current=null;});return()=>{if(pending.current!==null)cancelAnimationFrame(pending.current);};},[]);
+  useEffect(()=>{document.documentElement.lang=locale;document.documentElement.dir=locale==='ar'?'rtl':'ltr';try{localStorage.setItem('iteralpha_locale',locale);}catch{}document.cookie=`iteralpha_locale=${encodeURIComponent(locale)}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol==='https:'?'; Secure':''}`;document.title=localizeText(locale,'IterAlpha — Your strategy, in motion');},[locale]);
   const chooseLocale=useCallback((next:Locale)=>{if(pending.current!==null){cancelAnimationFrame(pending.current);pending.current=null;}setLocale(next);},[]);
   const value=useMemo(()=>({locale,setLocale:chooseLocale,t:(key:TranslationKey)=>translate(locale,key)}),[locale,chooseLocale]);
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;

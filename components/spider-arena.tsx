@@ -1,4 +1,8 @@
 'use client';
+import LocalizedContent from './localized-content';
+
+
+
 import {useEffect, useId, useState} from 'react';
 import {Activity, ArrowDownRight, ArrowUpRight, Check, CirclePause, ScanLine, Shield, Zap} from 'lucide-react';
 import type {BotView, Cycle, Snapshot} from '../lib/spider/types';
@@ -8,7 +12,7 @@ import {SPIDER} from '../lib/spider/copy';
 const posts = [{x:210,y:58},{x:340,y:144},{x:210,y:230},{x:80,y:144}];
 const colors = ['#60e7e1','#b99aff','#f391d2','#71f2ac'];
 export function SpiderAvatar({compact = false}: {compact?: boolean}) {
-  return <svg className={`cy-avatar ${compact ? 'compact' : ''}`} viewBox="-60 -50 120 100" aria-hidden="true"><g className="cy-spider-legs">{[-1,1].map(side => <g key={side} transform={`scale(${side} 1)`}>{[0,1,2,3].map(index => <path key={index} className={`leg-${index}`} d={`M10 ${-17+index*10} L${26+index*2} ${-36+index*22} L${48-index*3} ${-40+index*26}`} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>)}</g>)}</g><path d="M0 -5 C-21 -8 -23 21 0 32 C23 21 21 -8 0 -5" fill="currentColor" fillOpacity=".17" stroke="currentColor" strokeWidth="1.5"/><path d="M0 -23 C-14 -23 -15 -6 0 0 C15 -6 14 -23 0 -23" fill="currentColor"/><path d="M-4 9 L0 15 L4 9 M0 15 V23" stroke="currentColor" strokeWidth="1.5" fill="none"/><circle cx="-4" cy="-15" r="1.7" fill="#090812"/><circle cx="4" cy="-15" r="1.7" fill="#090812"/></svg>;
+  return <LocalizedContent>{<svg className={`cy-avatar ${compact ? 'compact' : ''}`} viewBox="-60 -50 120 100" aria-hidden="true"><g className="cy-spider-legs">{[-1,1].map(side => <g key={side} transform={`scale(${side} 1)`}>{[0,1,2,3].map(index => <path key={index} className={`leg-${index}`} d={`M10 ${-17+index*10} L${26+index*2} ${-36+index*22} L${48-index*3} ${-40+index*26}`} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>)}</g>)}</g><path d="M0 -5 C-21 -8 -23 21 0 32 C23 21 21 -8 0 -5" fill="currentColor" fillOpacity=".17" stroke="currentColor" strokeWidth="1.5"/><path d="M0 -23 C-14 -23 -15 -6 0 0 C15 -6 14 -23 0 -23" fill="currentColor"/><path d="M-4 9 L0 15 L4 9 M0 15 V23" stroke="currentColor" strokeWidth="1.5" fill="none"/><circle cx="-4" cy="-15" r="1.7" fill="#090812"/><circle cx="4" cy="-15" r="1.7" fill="#090812"/></svg>}</LocalizedContent>;
 }
 export default function SpiderArena({bot, snapshot, fresh, observing, motion, replay, onInspect}: {bot: BotView | null; snapshot: Snapshot | null; fresh: boolean; observing: boolean; motion: boolean; replay: Cycle | null; onInspect: () => void}) {
   const mode = cockpitMode(bot, fresh, replay), checks = cycleChecks(bot, replay), cycle = replay ?? bot?.cycles?.at(-1) ?? null;
@@ -25,7 +29,7 @@ export default function SpiderArena({bot, snapshot, fresh, observing, motion, re
   const remaining = mode === 'live' && bot?.lastEvaluationAt ? Math.max(0,(bot.lastEvaluationAt+(bot.config.evaluationSeconds??5)*1000-now)/1000) : null;
   const progress = bot?.tapeReading ? Math.min(1,bot.tapeReading.windowSeconds/30) : 0;
   const lastReason = mode === 'paused' ? bot?.events.at(-1)?.reason ?? 'paused' : mode === 'offline' ? 'feed-unavailable' : cycle?.reason;
-  return <section className={`cy-arena cy-panel mode-${mode} ${active>=0 ? 'is-working' : ''}`} aria-label={C.arena}>
+  return <LocalizedContent>{<section className={`cy-arena cy-panel mode-${mode} ${active>=0 ? 'is-working' : ''}`} aria-label={C.arena}>
     <div className="cy-panel-head"><h2><span className="cy-led"/>{C.arena}</h2><span>{mode === 'replay' ? C.replay : C.rules} <i>01</i></span></div>
     {cycle&&cycle.action!=='hold'&&mode!=='paused'&&mode!=='offline'&&<span key={cycle.time} className={`cy-fill-flash ${cycle.action}`} aria-hidden="true"/>}
     <div className="cy-arena-status"><span className={`cy-status-pill ${mode}`}><i/>{C.mode[mode]}</span><span className="cy-eval-time">{C.cadence}<b>{bot?.config.evaluationSeconds??5}{C.seconds}</b></span></div>
@@ -55,5 +59,5 @@ export default function SpiderArena({bot, snapshot, fresh, observing, motion, re
     <div className="cy-pipeline" aria-label={C.recorded}>{PIPELINE.map((name,index)=>{const check=checks.find(item=>item.stage===name),status=check?.status??'waiting',Icon=index===0?ScanLine:index===1?Activity:index===2?Shield:Zap;return <button type="button" className={`${status} ${active===index?'active':''}`} title={check?.reason?SPIDER.reasons[check.reason]:C.stageHint[name]} key={name} onClick={onInspect}><Icon size={14}/><span>{C.stage[name]}<small>{C.status[status]}</small></span>{status==='passed'||status==='filled'?<Check size={10}/>:null}</button>;})}</div>
     <button className={`cy-result ${mode==='paused'?'paused':action}`} onClick={onInspect} title={lastReason?SPIDER.reasons[lastReason]:C.noRecord}><span className="cy-result-icon">{mode==='paused'?<CirclePause size={22}/>:action==='buy'?<ArrowUpRight size={23}/>:action==='sell'?<ArrowDownRight size={23}/>:<Activity size={23}/>}</span><span><strong>{mode==='paused'?C.mode.paused:mode==='offline'?C.mode.offline:C.action[action]}</strong><small>{lastReason?C.reasons[lastReason]:C.noCycles}</small></span><span className="cy-result-arrow">↗</span></button>
     <div className="cy-arena-footer"><span>{mode==='replay'?C.replay:C.recorded}<b>{cycle?new Date(cycle.time).toISOString().slice(11,19):'—'}</b></span>{bot?.config.strategy==='tape'&&mode!=='replay'?<span className="cy-warmup" title={C.warmup}><i><b style={{width:`${progress*100}%`}}/></i>{Math.min(30,bot.tapeReading?.windowSeconds??0).toFixed(0)}/30s</span>:<span>{C.checks}<b>{bot?.cycleCount??0}</b></span>}<span>{C.next}<b>{remaining===null?'—':remaining>0?`${remaining.toFixed(1)}s`:'…'}</b></span></div>
-  </section>;
+  </section>}</LocalizedContent>;
 }

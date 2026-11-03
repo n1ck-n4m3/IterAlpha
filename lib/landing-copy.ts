@@ -3,7 +3,7 @@ export const LANDING_COPY = {
   hero: {
     eyebrow:'AUTOMATED CRYPTO. VISIBLE AT EVERY STEP.',
     title:'Your strategy.\nAn agent in motion.',
-    description:'Give your agent a direction. Watch it read the market, check the rules, and manage paper trades. See what it did—and what it earned after costs.',
+    description:'Give your agent a direction. Watch it read the market, check the rules, and manage paper trades. See what it did—and what it gained or lost after costs.',
     primary:'Launch your agent',secondary:'Simple or Pro?',
     note:'Real exchange quotes · Virtual funds · No deposit',ribbon:'CHOOSE ✦ DELEGATE ✦ WATCH ✦ REVIEW ✦ REFINE ✦',
   },

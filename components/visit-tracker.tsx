@@ -8,7 +8,7 @@ function pageForPath(pathname:string){
   if(pathname==='/')return 'home';
   if(pathname==='/app'){
     const view=readAppRoute(window.location.search).view;
-    return view==='train'?'training':view;
+    return view;
   }
   return null;
 }
