@@ -63,7 +63,7 @@
   "m_a12be37b56ff": "Il faut au moins 40 bougies récentes, consécutives et clôturées avant un signal.",
   "m_9afb97cd7a2e": "Impossible de démarrer l'audio. Cliquez à nouveau sur Tester le son ou vérifiez les autorisations audio du navigateur.",
   "m_32ece0920953": "Audio activé dans ce navigateur. En cas de silence, vérifiez le volume de l'appareil ou si l'onglet est muet.",
-  "m_e8a6b0e6f5db": "L'exécution automatique fonctionne tant que cet espace est visible. Le quitter suspend l'exécution au prochain contrôle ; aucune position n'est reconstituée rétroactivement. Le propriétaire peut configurer un exécuteur distinct permanent.",
+  "m_e8a6b0e6f5db": "L’exécution automatique continue entre les pages tant que cet onglet reste visible. Le masquer ou le fermer la suspend ; les opérations manquées ne sont pas reconstituées. Une exécution permanente nécessite un service serveur configuré séparément.",
   "m_de8206b2c557": "Liquidités disponibles",
   "m_ad9785b4473c": "OFFRE D'ACHAT",
   "m_a1f4014f85aa": "BLOQUÉ",
@@ -92,9 +92,9 @@
   "m_697b041641f4": "Chasseur de cassures",
   "m_b37166a64cdd": "Flux du navigateur enregistré. Reconnectez-vous, puis reprenez à l'arrivée de cotations récentes.",
   "m_719392b4c3e4": "Les cotations du navigateur sont signalées comme non vérifiées. Les exercices distincts utilisent des trajectoires synthétiques identifiées. Aucun prix en direct de remplacement n'est inventé.",
-  "m_398f2c044c42": "L'exécution par le navigateur se suspend lorsque l'espace est masqué ou fermé. Une position ouverte en pause n'a pas de sortie automatique. L'exécution permanente nécessite un processus serveur configuré séparément.",
-  "m_5b66081c2231": "L'exécution par le navigateur se suspend lorsque cet espace est masqué ou fermé. Une position ouverte en pause n'a pas de sortie automatique.",
-  "m_e38515c9fd55": "Les cotations fournies par le navigateur ne sont pas vérifiées. L'exécution se suspend si cette page est masquée ou fermée.",
+  "m_398f2c044c42": "Vous pouvez parcourir les autres pages du site pendant que l’agent continue. Masquer ou fermer cet onglet suspend l’exécution du navigateur. Une position ouverte en pause n’a pas de sortie automatique. L’exécution permanente nécessite un service serveur configuré séparément.",
+  "m_5b66081c2231": "La navigation maintient la surveillance active. Masquer ou fermer cet onglet suspend l’exécution du navigateur. Une position ouverte en pause n’a pas de sortie automatique.",
+  "m_e38515c9fd55": "Les cours du navigateur ne sont pas vérifiés. La navigation dans le site maintient l’exécution ; masquer ou fermer cet onglet la suspend.",
   "m_52f77fb6ef02": "Constitution d'une fenêtre d'observation de 30 secondes avant d'évaluer la dynamique.",
   "m_d769a1f38549": "Création du graphique en direct…",
   "m_f4dab3787ba6": "Constitution de la fenêtre d'observation",
@@ -879,5 +879,8 @@
   "m_7cff71d51200": "{0} marchés",
   "m_d8885610a2ef": "Volume sonore",
   "m_5d55591316f1": "Choisissez un marché au comptant, un solde virtuel et une stratégie. Vérifiez le budget d’entrée et les distances de sortie.",
-  "m_a616afe2bbed": "Créer un autre agent"
+  "m_a616afe2bbed": "Créer un autre agent",
+  "m_ca9c05caf0c3": "État de l’agent",
+  "m_261f61ec6eec": "Agent en cours",
+  "m_6eba75197dc3": "Continue entre les pages tant que cet onglet reste visible."
 }

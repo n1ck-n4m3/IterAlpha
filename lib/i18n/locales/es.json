@@ -63,7 +63,7 @@
   "m_a12be37b56ff": "Se necesitan al menos 40 velas recientes, consecutivas y cerradas para emitir una señal.",
   "m_9afb97cd7a2e": "No se pudo iniciar el audio. Pulsa Probar sonido de nuevo o revisa los permisos de sonido del navegador.",
   "m_32ece0920953": "Audio activado en este navegador. Si no suena, revisa el volumen del dispositivo o si la pestaña está silenciada.",
-  "m_e8a6b0e6f5db": "La ejecución automática funciona mientras este espacio está visible. Al salir, se pausa en la siguiente comprobación; no se reconstruyen posiciones retroactivamente. El propietario puede configurar un ejecutor independiente siempre activo.",
+  "m_e8a6b0e6f5db": "La ejecución automática continúa entre páginas mientras esta pestaña esté visible. Ocultarla o cerrarla pausa la ejecución; no se recrean operaciones omitidas. La ejecución permanente requiere un proceso de servidor configurado aparte.",
   "m_de8206b2c557": "Efectivo disponible",
   "m_ad9785b4473c": "OFERTA DE COMPRA",
   "m_a1f4014f85aa": "BLOQUEADO",
@@ -92,9 +92,9 @@
   "m_697b041641f4": "Cazador de rupturas",
   "m_b37166a64cdd": "Flujo del navegador guardado. Reconecta y reanuda cuando lleguen cotizaciones recientes.",
   "m_719392b4c3e4": "Las cotizaciones del navegador se etiquetan como no verificadas. Las sesiones de práctica independientes usan trayectorias sintéticas identificadas. No se inventan precios en vivo de sustitución.",
-  "m_398f2c044c42": "La ejecución desde el navegador se pausa al ocultar o cerrar el espacio. Una posición abierta en pausa no tiene salidas automáticas. La ejecución permanente requiere un proceso de servidor configurado por separado.",
-  "m_5b66081c2231": "La ejecución desde el navegador se pausa al ocultar o cerrar este espacio. Una posición abierta en pausa no tiene salidas automáticas.",
-  "m_e38515c9fd55": "Las cotizaciones del navegador no están verificadas. La ejecución se pausa al ocultar o cerrar esta página.",
+  "m_398f2c044c42": "Puedes navegar por otras páginas del sitio mientras el agente continúa. Ocultar o cerrar esta pestaña pausa la ejecución del navegador. Las posiciones abiertas en pausa no tienen salidas automáticas. La ejecución permanente requiere un proceso de servidor configurado aparte.",
+  "m_5b66081c2231": "La navegación mantiene el monitoreo activo. Ocultar o cerrar esta pestaña pausa la ejecución del navegador. Las posiciones abiertas en pausa no tienen salidas automáticas.",
+  "m_e38515c9fd55": "Los precios del navegador no están verificados. Navegar por el sitio mantiene la ejecución; ocultar o cerrar esta pestaña la pausa.",
   "m_52f77fb6ef02": "Creando una ventana de observación de 30 segundos antes de evaluar el impulso.",
   "m_d769a1f38549": "Creando el gráfico en vivo…",
   "m_f4dab3787ba6": "Creando la ventana de observación",
@@ -879,5 +879,8 @@
   "m_7cff71d51200": "{0} mercados",
   "m_d8885610a2ef": "Volumen de audio",
   "m_5d55591316f1": "Elige un mercado al contado, un saldo virtual y una estrategia. Revisa el presupuesto de entrada y las distancias de salida.",
-  "m_a616afe2bbed": "Crear otro agente"
+  "m_a616afe2bbed": "Crear otro agente",
+  "m_ca9c05caf0c3": "Estado del agente",
+  "m_261f61ec6eec": "Agente en ejecución",
+  "m_6eba75197dc3": "Continúa entre páginas mientras esta pestaña permanezca visible."
 }

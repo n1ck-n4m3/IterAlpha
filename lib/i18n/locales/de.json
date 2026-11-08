@@ -63,7 +63,7 @@
   "m_a12be37b56ff": "Vor einem Signal werden mindestens 40 aktuelle, aufeinanderfolgende abgeschlossene Kerzen benötigt.",
   "m_9afb97cd7a2e": "Audio konnte nicht gestartet werden. Klicke erneut auf „Ton testen“ oder prüfe die Audioberechtigungen des Browsers.",
   "m_32ece0920953": "Audio in diesem Browser aktiviert. Falls nichts zu hören ist, prüfe die Gerätelautstärke und die Stummschaltung des Tabs.",
-  "m_e8a6b0e6f5db": "Die automatische Ausführung läuft, solange dieser Arbeitsbereich sichtbar ist. Beim Verlassen pausiert sie bei der nächsten Prüfung; Positionen werden nicht nachträglich ergänzt. Der Betreiber kann einen separaten Dauerbetrieb einrichten.",
+  "m_e8a6b0e6f5db": "Die automatische Ausführung läuft beim Seitenwechsel weiter, solange dieser Tab sichtbar ist. Ausblenden oder Schließen pausiert sie; verpasste Trades werden nicht nachgeholt. Dauerbetrieb benötigt einen separat eingerichteten Serverprozess.",
   "m_de8206b2c557": "Verfügbares Guthaben",
   "m_ad9785b4473c": "GELDKURS",
   "m_a1f4014f85aa": "BLOCKIERT",
@@ -92,9 +92,9 @@
   "m_697b041641f4": "Ausbruchsjäger",
   "m_b37166a64cdd": "Browser-Feed gespeichert. Verbinde ihn erneut und setze fort, sobald aktuelle Kurse eintreffen.",
   "m_719392b4c3e4": "Browserkurse werden als ungeprüft gekennzeichnet. Separate Übungsrunden nutzen gekennzeichnete synthetische Verläufe. Es werden keine Ersatz-Livekurse erfunden.",
-  "m_398f2c044c42": "Die browsergesteuerte Ausführung pausiert, wenn der Arbeitsbereich ausgeblendet oder geschlossen wird. Eine pausierte offene Position hat keine automatischen Ausstiege. Dauerbetrieb erfordert einen separat konfigurierten Server-Worker.",
-  "m_5b66081c2231": "Die browsergesteuerte Ausführung pausiert, wenn dieser Arbeitsbereich ausgeblendet oder geschlossen wird. Eine pausierte offene Position hat keine automatischen Ausstiege.",
-  "m_e38515c9fd55": "Vom Browser gelieferte Kurse sind ungeprüft. Die Ausführung pausiert, wenn diese Seite ausgeblendet oder geschlossen wird.",
+  "m_398f2c044c42": "Du kannst andere Seiten der Website besuchen, während der Agent weiterläuft. Ausblenden oder Schließen dieses Tabs pausiert die Browserausführung. Pausierte offene Positionen haben keine automatischen Ausstiege. Dauerbetrieb benötigt einen separat eingerichteten Serverprozess.",
+  "m_5b66081c2231": "Die Überwachung läuft beim Seitenwechsel weiter. Wird dieser Tab ausgeblendet oder geschlossen, pausiert die Browserausführung. Pausierte offene Positionen haben keine automatischen Ausstiege.",
+  "m_e38515c9fd55": "Browserkurse sind ungeprüft. Die Ausführung läuft beim Seitenwechsel weiter; ein ausgeblendeter oder geschlossener Tab pausiert sie.",
   "m_52f77fb6ef02": "Vor der Momentum-Bewertung wird ein 30-Sekunden-Beobachtungsfenster aufgebaut.",
   "m_d769a1f38549": "Live-Chart wird aufgebaut…",
   "m_f4dab3787ba6": "Beobachtungsfenster wird aufgebaut",
@@ -879,5 +879,8 @@
   "m_7cff71d51200": "{0} Märkte",
   "m_d8885610a2ef": "Lautstärke",
   "m_5d55591316f1": "Wähle einen Spotmarkt, ein virtuelles Guthaben und eine Strategie. Prüfe das Einstiegsbudget und die Ausstiegsabstände.",
-  "m_a616afe2bbed": "Weiteren Agenten erstellen"
+  "m_a616afe2bbed": "Weiteren Agenten erstellen",
+  "m_ca9c05caf0c3": "Agentenstatus",
+  "m_261f61ec6eec": "Agent aktiv",
+  "m_6eba75197dc3": "Läuft beim Seitenwechsel weiter, solange dieser Tab sichtbar bleibt."
 }

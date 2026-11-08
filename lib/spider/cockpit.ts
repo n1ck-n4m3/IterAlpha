@@ -53,7 +53,7 @@ export const COCKPIT = {
   marketScope: 'The Binance feed samples exchange candles, ticker data, and up to 100 book levels, normally every 5 seconds. It does not include trader identities, a trade-by-trade stream, news, or on-chain data. Snapshot age is time since receipt, not the time of the last trade.',
   dataReference: 'Market data reference',
   semantics: 'Short labels show saved checks. A rule proposal is separate from a paper fill. Hover a result or open Evidence for its full explanation.',
-  liveLimit: 'Browser-driven execution pauses when this workspace is hidden or closed. A paused open position has no automatic exits.',
+  liveLimit: 'Site navigation keeps monitoring active. Hiding or closing this browser tab pauses browser-driven execution. A paused open position has no automatic exits.',
   costLimit: 'Paper fills include configured fees and adverse slippage. Visible depth is checked; queue position and exchange latency are not simulated.',
   rights: 'Coinbase is awaiting configured data permissions. Browser-supplied quotes are unverified and excluded from rankings.',
   stale: 'Feed interrupted. No orders from stale prices.',

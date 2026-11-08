@@ -22,7 +22,7 @@ export const SPIDER = {
   start: 'Start spider', pause: 'Pause entries & exits', resume: 'Resume spider', close: 'Close position & pause',
   pausedPosition: 'Position remains open. Pausing stops all monitoring and automatic exits. Resume or close it to continue.',
   running: 'Watching the market', paused: 'Spider paused', starting: 'Starting…', history: 'Saved spiders', fresh: 'New spider',
-  runtime: 'Auto-execution runs while this workspace is visible. Leaving it pauses execution on the next check; positions are not backfilled. A separate always-on runner can be configured by the owner.',
+  runtime: 'Auto-execution continues across site pages while this browser tab stays visible. Hiding or closing the tab pauses it; missed trades are not backfilled. Always-on execution needs a separately configured server runner.',
   rules: 'Spot, long only · configurable paper costs · spread & depth checked · 5% drawdown pause',
   cadence: 'Market snapshots target a 5-second refresh. Book pulse evaluates sampled quotes; candle strategies still wait for a completed bar. Protective exits check each fresh update. Network delays can extend the interval.',
   nativeQuote: 'Balance, fees, and returns use this pair’s quote asset. USDT, USDC, BTC, and USD are separate units.',

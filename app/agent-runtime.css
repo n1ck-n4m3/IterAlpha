@@ -1,0 +1,22 @@
+/* Header controls keep their intrinsic width; the header wraps before any label clips. */
+.landing-header{height:auto;min-height:82px;flex-wrap:wrap;gap:12px 16px;padding-block:14px}
+.landing-brand,.landing-header .language-switcher,.landing-header .account-links,.landing-header .ia-audio,.landing-header .mobile-nav{flex-shrink:0}
+.landing-header nav{flex-shrink:0;gap:18px}
+.landing-header-cta{flex:0 0 auto;inline-size:max-content;max-inline-size:100%;min-block-size:44px;padding:12px 18px;line-height:1.35;white-space:nowrap}
+.landing-header-cta>span{display:block;flex-shrink:0}
+.landing-header-cta>svg{flex:none}
+@media(max-width:1350px){.landing-header nav,.landing-header .landing-access-link,.landing-header .motion-toggle{display:none}.landing-header .mobile-nav{display:block;margin-inline-start:auto;margin-inline-end:0}}
+@media(max-width:700px){.landing-header{gap:10px;padding:12px 18px}.landing-header .landing-language select{max-width:104px}.landing-header-cta{font-size:12px;padding:11px 16px}.landing-header .mobile-nav>div{right:0;max-width:calc(100vw - 36px)}}
+@media(max-width:400px){.landing-header-cta{font-size:12px;gap:8px;padding:11px 16px}.landing-header-cta svg{width:15px}.landing-header .landing-brand{font-size:19px}}
+.agent-status-dock{position:fixed;z-index:80;inset-inline-end:20px;bottom:20px;display:flex;align-items:center;gap:14px;max-inline-size:min(660px,calc(100vw - 40px));padding:14px 16px;border:1px solid #b593ff55;border-radius:24px;background:linear-gradient(120deg,#1c1029f2,#100d1df5 70%);box-shadow:0 18px 65px #0009,inset 0 1px #fff1;backdrop-filter:blur(24px);animation:agent-dock-enter .35s ease-out;font-size:12px}
+.agent-dock-orb{display:grid;place-items:center;flex:none;inline-size:44px;block-size:44px;border-radius:50%;color:#b6a0de;border:1px solid #a387d740;background:#7854a320}
+.agent-status-dock.is-running .agent-dock-orb{color:#c3b0ff;box-shadow:0 0 24px #ae79ff30;animation:agent-dock-pulse 3s ease-in-out infinite}
+.agent-dock-orb.is-checking{background:#9e6cdb44}
+.agent-dock-summary{min-inline-size:0;display:grid;gap:5px}.agent-dock-summary strong{font-size:13px;color:#f1eaff}.agent-dock-summary>span{display:flex;align-items:center;flex-wrap:wrap;gap:5px;color:#c8bdd9;font-size:11px}.agent-dock-summary b{font-weight:500}.agent-dock-summary i{font-style:normal;color:#89749d}.agent-dock-summary small{color:#a294b5;font-size:10px;line-height:1.4}
+.agent-dock-actions{display:flex;align-items:center;gap:7px;flex-shrink:0}.agent-dock-actions button,.agent-dock-actions a{display:flex;align-items:center;justify-content:center;gap:6px;min-block-size:42px;padding:9px 12px;border-radius:14px;border:1px solid #aa8eda40;color:#dfcef6;background:#9063bd1c;font-size:11px}.agent-dock-actions a{background:#c9b4f5;color:#1b1029;border-color:#e0cfff66}.agent-dock-actions button:hover,.agent-dock-actions a:hover{filter:brightness(1.15);transform:translateY(-2px)}.agent-dock-actions button:disabled{opacity:.5;cursor:wait}
+body:has(.agent-status-dock) .landing-footer{padding-bottom:155px}
+@keyframes agent-dock-pulse{50%{box-shadow:0 0 0 5px #a47ad810,0 0 30px #ae79ff33}}
+@keyframes agent-dock-enter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.agent-status-dock{inset-inline:12px;bottom:12px;max-inline-size:none;gap:10px;padding:12px;border-radius:22px;flex-wrap:wrap}.agent-dock-summary{flex:1}.agent-dock-actions{width:100%;justify-content:flex-end}.agent-dock-actions a{flex:1}.agent-dock-summary small{max-width:260px}}
+@media(prefers-reduced-motion:reduce){.agent-status-dock,.agent-status-dock.is-running .agent-dock-orb{animation:none}.agent-dock-actions button:hover,.agent-dock-actions a:hover{transform:none}}
+.agent-status-dock:has(.agent-dock-feedback){flex-wrap:wrap}.agent-dock-feedback{flex-basis:100%;margin:0;color:#efb2ca;font-size:11px;line-height:1.5}

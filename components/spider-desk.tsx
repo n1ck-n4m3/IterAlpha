@@ -7,9 +7,8 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Activity, ArrowUpRight, Check, ChevronDown, Download, FileSearch, History, Info, Layers3, Pause, Play, Radio, RefreshCw, Search, Settings2, ShieldCheck, SlidersHorizontal, Waves, X, Zap} from 'lucide-react';
 import type {BotView, EvaluationSeconds, Interval, Market, Snapshot, Strategy} from '../lib/spider/types';
 import {SPIDER as C, STRATEGIES} from '../lib/spider/copy';
-import {EXECUTION, stats} from '../lib/spider/engine';
 import AnimatedNumber from './animated-number';
-import {browserDirectory, browserSnapshot} from '../lib/spider/browser-feed';
+import {browserSnapshot} from '../lib/spider/browser-feed';
 import SpiderChart from './spider-chart';
 import SpiderConnections from './spider-connections';
 import SpiderArena, {SpiderAvatar} from './spider-arena';
@@ -19,68 +18,28 @@ import SpiderSimple from './spider-simple';
 import {MANDATES, SIMPLE as S, matchingMandate, type MandateId} from '../lib/spider/mandates';
 import {COCKPIT as V} from '../lib/spider/cockpit';
 import SpiderEvidence from './spider-evidence';
-import {isNewerVersion, SpiderQueue, SpiderRequestError, spiderRequest as api} from '../lib/spider/client';
+import {spiderRequest as api} from '../lib/spider/client';
+import {useSpiderRuntime} from './spider-runtime-provider';
 
-type Catalog = {direct?: boolean; markets: Market[]; venues: {venue: string; status: string; count: number}[]};
 const number = (value: number, digits = 4) => new Intl.NumberFormat('en-US', {maximumFractionDigits: digits}).format(value);
 const amount = (value: number, quote: string) => `${number(value, Math.abs(value) < 1 ? 8 : 2)} ${quote}`;
 const clock = (value: number) => new Date(value).toLocaleTimeString('en-GB', {timeZone: 'UTC'});
 export default function SpiderDesk({initialMode='easy'}:{initialMode?:'easy'|'pro'}) {
-  const [mode,setMode]=useState(initialMode),[mandate,setMandate]=useState<MandateId>('trend');
+  const runtime=useSpiderRuntime();
+  const {catalog,bots,bot,marketId,interval,setIntervalValue,strategy,evaluationSeconds,setEvaluationSeconds,cooldown,setCooldown,feeBps,setFeeBps,slippageBps,setSlippageBps,capital,setCapital,allocation,setAllocation,stop,setStop,target,setTarget,setSnapshot,feedError,setFeedError,error,setError,busy,observing,clockNow,botRef,accountsLoading,pendingAction,controlNotice,setControlNotice,retryKey,setRetryKey,directMode,loadCatalog,market,quote,base,currentSnapshot,fresh,metrics,locked,settingsError,command,start,selectStrategy,attachWorkspace,detachWorkspace}=runtime;
+  const [mode,setMode]=useState(initialMode);
+  useEffect(()=>setMode(initialMode),[initialMode]);
+  useEffect(()=>runtime.setWorkspaceMode(mode),[mode,runtime.setWorkspaceMode]);
+  useEffect(()=>{attachWorkspace();return detachWorkspace;},[attachWorkspace,detachWorkspace]);
   useEffect(()=>{const sync=()=>setMode(new URLSearchParams(window.location.search).get('mode')==='pro'?'pro':'easy');window.addEventListener('popstate',sync);return()=>window.removeEventListener('popstate',sync);},[]);
-  const [catalog, setCatalog] = useState<Catalog | null>(null), [bots, setBots] = useState<BotView[]>([]), [bot, setBot] = useState<BotView | null>(null);
-  const [marketId, setMarketId] = useState('binance:BTCUSDT'), [interval, setIntervalValue] = useState<Interval>(300), [strategy, setStrategy] = useState<Strategy>('trend');
-  const [evaluationSeconds, setEvaluationSeconds] = useState<EvaluationSeconds>(15), [cooldown, setCooldown] = useState(30), [feeBps, setFeeBps] = useState(10), [slippageBps, setSlippageBps] = useState(5);
-  const [capital, setCapital] = useState('10000'), [allocation, setAllocation] = useState(20), [stop, setStop] = useState(1), [target, setTarget] = useState(2);
-  const [snapshot, setSnapshot] = useState<Snapshot | null>(null), [feedError, setFeedError] = useState(''), [error, setError] = useState(''), [busy, setBusy] = useState(false);
-  const [picker, setPicker] = useState(false), [visibleMarkets, setVisibleMarkets] = useState(100), [search, setSearch] = useState(''), [venue, setVenue] = useState('all'), [advanced, setAdvanced] = useState(false), [runner, setRunner] = useState(false), [clockNow, setClockNow] = useState(0), [observing, setObserving] = useState(false);
-  const [panel, setPanel] = useState<'setup'|'markets'|'history'|'ledger'|'evidence'|'connections'|'info'|null>(null), dialog = useRef<HTMLDialogElement>(null);
-  const [motion, setMotion] = useState(true), [replayTime, setReplayTime] = useState<number|null>(null), [ledgerTab, setLedgerTab] = useState<'fills'|'equity'>('fills');
-  useEffect(() => {setMotion(!window.matchMedia('(prefers-reduced-motion: reduce)').matches);}, []);
-  useEffect(() => {if (panel && !dialog.current?.open) dialog.current?.showModal(); else if (!panel) dialog.current?.close();}, [panel]);
-  const selectReplay = useCallback((time:number|null)=>setReplayTime(time),[]);
-  const lastCue = useRef(''), queue = useRef(new SpiderQueue()), mounted = useRef(true);
-  const [accountsLoading, setAccountsLoading] = useState(true), [pendingAction, setPendingAction] = useState(''), [controlNotice, setControlNotice] = useState(''), [retryKey, setRetryKey] = useState(0);
-  useEffect(() => {if (!controlNotice) return; const timer=setTimeout(()=>setControlNotice(''),5500);return()=>clearTimeout(timer);}, [controlNotice]);
-  const [chartInterval, setChartInterval] = useState<Interval>(300), [chartSnapshot, setChartSnapshot] = useState<Snapshot | null>(null), [chartError, setChartError] = useState('');
-  useEffect(() => {const timer = window.setInterval(() => {if (!document.hidden) setClockNow(Date.now());}, 1000); return () => clearInterval(timer);}, []);
-  const directMode = bot ? bot.config.feedMode === 'browser' : !!catalog?.direct && marketId.startsWith('binance:');
-  const botRef = useRef(bot), pendingStart = useRef<{signature: string; id: string} | null>(null), commandBusy = useRef(false), listRef = useRef<HTMLDivElement>(null);
-  const accept = useCallback((next: BotView) => {if (!isNewerVersion(botRef.current, next)) return; botRef.current = next; if (!mounted.current) return; setBot(next); setBots(old => [next, ...old.filter(b => b.id !== next.id)].sort((a, b) => b.updatedAt - a.updatedAt));}, []);
-  const openBot = useCallback((next: BotView) => {accept(next); setMandate(next.config.mandate??matchingMandate(next.config)??'trend'); setMarketId(next.config.market.id); setIntervalValue(next.config.interval); setChartInterval(next.config.interval); setChartSnapshot(null); setControlNotice(''); setReplayTime(null); setStrategy(next.config.strategy); setCapital(String(next.config.initialCash)); setAllocation(next.config.allocationPercent); setStop(next.config.stopPercent); setTarget(next.config.targetPercent); setEvaluationSeconds(next.config.evaluationSeconds ?? 5); setCooldown(next.config.cooldownSeconds ?? 0); setFeeBps(next.config.feeBps ?? 10); setSlippageBps(next.config.slippageBps ?? 5);}, [accept]);
-  const loadCatalog = useCallback(async () => {try {
-    const server=await api<Catalog>('/api/spider/markets');
-    if(new URLSearchParams(window.location.search).get('feed')==='browser'||!server.markets.some(m=>m.venue==='binance')){
-      try {const markets=await browserDirectory();setCatalog({...server,direct:true,markets:[...markets,...server.markets.filter(m=>m.venue!=='binance')]});return;}catch {if(!server.markets.length){setCatalog(server);setError(C.browserUnavailable);return;}}
-    }
-    setCatalog(server);
-  } catch (e) {setError((e as Error).message);}}, []);
-  useEffect(() => {mounted.current = true; let active = true; void loadCatalog(); void api<{bots: BotView[]; runnerConfigured: boolean}>('/api/spiders').then(result => {if (!active) return; setBots(result.bots); setRunner(result.runnerConfigured); const latest = result.bots.find(b => b.status === 'running') ?? result.bots[0]; if (latest) openBot(latest);}).catch(e => {if (active) setError(e.message);}).finally(() => {if (active) setAccountsLoading(false);}); return () => {active = false; mounted.current = false;};}, [loadCatalog, openBot]);
-  useEffect(() => {
-    let disposed = false, timeout: ReturnType<typeof setTimeout>;
-    async function poll() {
-      if (disposed) return;
-      const cycleStarted = Date.now();
-      if (!document.hidden && catalog) {
-        setObserving(true);
-        let snapshotForTick:Snapshot|null=null;
-        try {const selected = (catalog?.markets??[]).find(m=>m.id===marketId)??botRef.current?.config.market;
-          const next = directMode && selected ? await browserSnapshot(selected,interval) : await api<Snapshot>(`/api/spider/market?market=${encodeURIComponent(marketId)}&interval=${interval}`); if (disposed) return; snapshotForTick=next; setSnapshot(next); setClockNow(Date.now()); setFeedError('');}
-        catch (e) {if (!disposed) {setFeedError((e as Error).message); setClockNow(Date.now());}}
-        if (!disposed && !commandBusy.current) {
-          await queue.current.run(async () => {
-            const current = botRef.current;
-            if (disposed || commandBusy.current || current?.status !== 'running' || current.config.market.id !== marketId) return;
-            try {const next = await api<BotView>(`/api/spiders/${current.id}/tick`, {version: current.version, ...(directMode && snapshotForTick ? {browserSnapshot: snapshotForTick} : {})}); if (botRef.current?.id === next.id) accept(next);}
-            catch (e) {if (!disposed) setError((e as Error).message);}
-          });
-        }
-      }
-      if (!disposed) setObserving(false);
-      if (!disposed) timeout = setTimeout(() => void poll(), Math.max(250, 5000 - (Date.now() - cycleStarted)));
-    }
-    void poll(); return () => {disposed = true; clearTimeout(timeout);};
-  }, [marketId, interval, accept, directMode, catalog, retryKey]);
+  const [picker,setPicker]=useState(false),[visibleMarkets,setVisibleMarkets]=useState(100),[search,setSearch]=useState(''),[venue,setVenue]=useState('all'),[advanced,setAdvanced]=useState(false);
+  const [panel,setPanel]=useState<'setup'|'markets'|'history'|'ledger'|'evidence'|'connections'|'info'|null>(null),dialog=useRef<HTMLDialogElement>(null),listRef=useRef<HTMLDivElement>(null);
+  const [motion,setMotion]=useState(true),[replayTime,setReplayTime]=useState<number|null>(null),[ledgerTab,setLedgerTab]=useState<'fills'|'equity'>('fills');
+  const [chartInterval,setChartInterval]=useState<Interval>(interval),[chartSnapshot,setChartSnapshot]=useState<Snapshot|null>(null),[chartError,setChartError]=useState('');
+  useEffect(()=>{setMotion(!window.matchMedia('(prefers-reduced-motion: reduce)').matches);},[]);
+  useEffect(()=>{if(panel&&!dialog.current?.open)dialog.current?.showModal();else if(!panel)dialog.current?.close();},[panel]);
+  useEffect(()=>{setChartInterval(interval);setChartSnapshot(null);setReplayTime(null);},[interval,bot?.id]);
+  const selectReplay=useCallback((time:number|null)=>setReplayTime(time),[]);
   useEffect(() => {
     if (chartInterval === interval) {setChartSnapshot(null); setChartError(''); return;}
     let active = true; let timer: ReturnType<typeof setTimeout>;
@@ -90,62 +49,16 @@ export default function SpiderDesk({initialMode='easy'}:{initialMode?:'easy'|'pr
       if (active) timer = setTimeout(() => void read(), 5000);
     }; void read(); return () => {active = false; clearTimeout(timer);};
   }, [chartInterval, interval, marketId, directMode, catalog, retryKey]);
-  useEffect(() => {
-    const pauseOnLeave = () => {
-      const current = botRef.current; if ((runner && current?.config.feedMode !== 'browser') || current?.status !== 'running') return;
-      void fetch(`/api/spiders/${current.id}/pause`, {method: 'POST', credentials: 'same-origin', keepalive: true, headers: {'Content-Type': 'application/json', 'X-IterAlpha-Request': '1'}, body: JSON.stringify({version: current.version})}).then(async response => {if (response.ok) {const next = await response.json() as BotView; if (botRef.current?.id === next.id) accept(next);}}).catch(() => {});
-    };
-    const onVisibility = () => {if (document.hidden) pauseOnLeave();};
-    document.addEventListener('visibilitychange', onVisibility); window.addEventListener('pagehide', pauseOnLeave);
-    return () => {document.removeEventListener('visibilitychange', onVisibility); window.removeEventListener('pagehide', pauseOnLeave); pauseOnLeave();};
-  }, [runner, accept]);
   useEffect(() => {if (!picker) return; const close = (event: KeyboardEvent) => {if (event.key === 'Escape') setPicker(false);}; document.addEventListener('keydown', close); listRef.current?.querySelector('input')?.focus(); return () => document.removeEventListener('keydown', close);}, [picker]);
-  useEffect(() => {const event = bot?.events.at(-1); if (!bot || !event) return; const key = `${bot.id}:${event.time}:${event.action}`; if (lastCue.current && lastCue.current !== key && event.action!=='hold') window.dispatchEvent(new CustomEvent('iteralpha:audio', {detail: event.action})); lastCue.current = key;}, [bot]);
-  const market = catalog?.markets.find(m => m.id === marketId) ?? bot?.config.market ?? snapshot?.market;
-  const quote = market?.quote ?? 'USDT', base = market?.base ?? 'BTC';
   const filtered = useMemo(() => (catalog?.markets ?? []).filter(m => (venue === 'all' || m.venue === venue) && `${m.base} ${m.quote} ${m.symbol}`.toLowerCase().includes(search.toLowerCase())).sort((a, b) => {
     const popular = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BTC-USD', 'ETH-USD']; const ai = popular.indexOf(a.symbol), bi = popular.indexOf(b.symbol); return (ai < 0 ? 100 : ai) - (bi < 0 ? 100 : bi);
   }), [catalog, venue, search]);
-  const currentSnapshot = snapshot?.market.id === marketId && snapshot.interval === interval ? snapshot : null;
-  const fresh = !!currentSnapshot && !feedError && clockNow - currentSnapshot.quoteTime < EXECUTION.maxSnapshotAge;
-  const metrics = bot ? stats(bot, currentSnapshot?.bid ?? bot.lastMark) : null, locked = !!bot;
-  const settingsError = !Number.isFinite(stop) || stop < .2 || stop > 10 || !Number.isFinite(target) || target < .4 || target > 20 ? V.invalidExits : !Number.isFinite(Number(capital)) || Number(capital) <= 0 || Number(capital) > 1_000_000_000 ? C.invalidCapital : !Number.isFinite(feeBps) || feeBps < 0 || feeBps > 200 || !Number.isFinite(slippageBps) || slippageBps < 0 || slippageBps > 100 ? C.invalidCosts : market && Number(capital) * allocation / 100 < market.minNotional * 1.01 ? `${C.minimumOrder} ${market.minNotional} ${quote}` : '';
-  const displayedSnapshot = chartInterval === interval ? currentSnapshot : chartSnapshot?.market.id === marketId && chartSnapshot.interval === chartInterval ? chartSnapshot : null;
-  async function command(action: 'pause' | 'resume' | 'close' | 'browser-feed') {
-    const selected = botRef.current; if (!selected || commandBusy.current) return;
-    commandBusy.current = true; setBusy(true); setPendingAction(action); setError(''); setControlNotice('');
-    try {
-      await queue.current.run(async () => {
-        for (let attempt = 0; attempt < 2; attempt++) {
-          const current = botRef.current; if (!current || current.id !== selected.id) return;
-          try {
-            const direct = (current.config.feedMode === 'browser' && action !== 'pause' || action === 'browser-feed') ? await browserSnapshot(current.config.market, current.config.interval) : null;
-            const saved = await api<BotView>(`/api/spiders/${current.id}/${action}`, {version: current.version, ...(direct ? {browserSnapshot: direct} : {})}); accept(saved);
-            if (action === 'close' && saved.quantity > 0) {setError(`${C.closeBlocked} ${C.reasons[saved.events.at(-1)?.reason ?? 'liquidity']}`); return;}
-            setControlNotice(action === 'resume' && saved.status !== 'running' ? C.reasons[saved.events.at(-1)?.reason ?? 'paused'] : C.confirmed[action]); return;
-          } catch (e) {
-            const result = await api<{bots: BotView[]}>('/api/spiders').catch(() => null), latest = result?.bots.find(b => b.id === selected.id);
-            if (latest) accept(latest);
-            if (latest && (action === 'pause' && latest.status === 'paused' || action === 'close' && latest.quantity === 0 && latest.status === 'paused')) {setControlNotice(C.confirmed[action]); return;}
-            if (!(e instanceof SpiderRequestError) || e.status !== 409 || !latest || attempt > 0) throw e;
-          }
-        }
-      });
-    } catch (e) {setError((e as Error).message);} finally {commandBusy.current = false; setBusy(false); setPendingAction('');}
-  }
-  async function start() {
-    if (commandBusy.current) return; commandBusy.current = true; setBusy(true); setPendingAction('start'); setControlNotice(''); setError('');
-    try {const configuration={strategy,interval,evaluationSeconds,cooldownSeconds:cooldown,allocationPercent:allocation,stopPercent:stop,targetPercent:target}; const selectedMandate=matchingMandate(configuration); const body = {...(selectedMandate?{mandate:selectedMandate}:{}),feedMode:directMode?'browser':'server',marketId, strategy, interval, initialCash: Number(capital), allocationPercent: allocation, stopPercent: stop, targetPercent: target, evaluationSeconds, cooldownSeconds: cooldown, feeBps, slippageBps}; const signature = JSON.stringify(body);
-      const pending = pendingStart.current?.signature === signature ? pendingStart.current : {signature, id: crypto.randomUUID()}; pendingStart.current = pending;
-      const direct=directMode&&market?await browserSnapshot(market,interval):null;
-      const next = await api<BotView>('/api/spiders', {...body, requestId: pending.id,...(direct?{browserSnapshot:direct}:{})}); pendingStart.current = null; accept(next);
-    } catch (e) {setError((e as Error).message);} finally {commandBusy.current = false; setBusy(false); setPendingAction('');}
-  }
-  function newSpider() {if (bots.some(b => b.status === 'running')) {setError(C.marketLocked); return;} botRef.current = null; setBot(null); setReplayTime(null); setIntervalValue(chartInterval); setError(''); setControlNotice(''); selectMandate(mandate); pendingStart.current = null;}
-  function selectMandate(id:MandateId){const plan=MANDATES[id];setMandate(id);setStrategy(plan.strategy);setIntervalValue(plan.interval);setChartInterval(plan.interval);setSnapshot(null);setAllocation(plan.allocationPercent);setStop(plan.stopPercent);setTarget(plan.targetPercent);setEvaluationSeconds(plan.evaluationSeconds);setCooldown(plan.cooldownSeconds);}
-  function selectMode(next:'easy'|'pro'){if(next==='easy'&&!bot)selectMandate(mandate);setMode(next);setReplayTime(null);const url=new URL(window.location.href);url.searchParams.set('mode',next);window.history.pushState({},'',url);}
-  function selectStrategy(next: Strategy) {setStrategy(next); setStop(next === 'tape' ? .3 : 1); setTarget(next === 'tape' ? .6 : 2);}
-  function selectMarket(next: Market) {if (locked || accountsLoading) return; setMarketId(next.id); setChartSnapshot(null); setPicker(false); setPanel(null); setSnapshot(null); setFeedError(''); if(next.quote!==quote)setCapital(['BTC','ETH'].includes(next.quote)?'1':'10000'); setFeeBps(next.venue === 'coinbase' ? 60 : 10);}
+  const displayedSnapshot=chartInterval===interval?currentSnapshot:chartSnapshot?.market.id===marketId&&chartSnapshot.interval===chartInterval?chartSnapshot:null;
+  function openBot(next:BotView){runtime.openBot(next);setChartInterval(next.config.interval);setChartSnapshot(null);setReplayTime(null);}
+  function newSpider(){runtime.newSpider();setReplayTime(null);}
+  function selectMandate(id:MandateId){runtime.selectMandate(id);setChartInterval(MANDATES[id].interval);setChartSnapshot(null);}
+  function selectMode(next:'easy'|'pro'){if(next==='easy'&&!bot)selectMandate(runtime.mandate);setMode(next);setReplayTime(null);const url=new URL(window.location.href);url.searchParams.set('mode',next);window.history.pushState({},'',url);}
+  function selectMarket(next:Market){if(runtime.selectMarket(next)){setChartSnapshot(null);setPicker(false);setPanel(null);}}
   function exportFills() {if (!bot) return; const rows = [['Time UTC', 'Market', 'Side', 'Quantity', 'Price', 'Fee', 'Quote asset', 'Net PnL', 'Reason'], ...bot.trades.map(t => [new Date(t.time).toISOString(), bot.config.market.symbol, t.side, t.quantity, t.price, t.fee, quote, t.netPnl ?? '', t.reason])]; const blob = new Blob([rows.map(r => r.join(',')).join('\n')], {type: 'text/csv'}); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `spider-${bot.id}.csv`; link.click(); URL.revokeObjectURL(link.href);}
   const replay = replayTime === null ? null : bot?.cycles?.find(cycle=>cycle.time===replayTime)??null;
   const reading = bot?.tapeReading, selectedStrategy = bot?.config.strategy??strategy, recentCycles = bot?.cycles??[];

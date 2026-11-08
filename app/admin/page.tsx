@@ -1,5 +1,5 @@
 import LocalizedContent from '../../components/localized-content';
-import Link from 'next/link';
+import Link from '../../components/site-link';
 import {notFound} from 'next/navigation';
 import {env} from 'cloudflare:workers';
 import {requireChatGPTUser} from '../chatgpt-auth';
